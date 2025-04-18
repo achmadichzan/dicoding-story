@@ -14,10 +14,12 @@ import com.achmadichzan.dicodingstory.domain.usecase.GetTokenUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.LoginUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.RegisterUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.SaveTokenUseCase
+import com.achmadichzan.dicodingstory.domain.usecase.UploadStoryUseCase
 import com.achmadichzan.dicodingstory.presentation.viewmodel.DetailViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.LoginViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.RegisterViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.StoryViewModel
+import com.achmadichzan.dicodingstory.presentation.viewmodel.UploadViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -32,7 +34,7 @@ val authModule = module {
 }
 
 val storyModule = module {
-    single<StoryRepository> { StoryRepositoryImpl(get()) }
+    single<StoryRepository> { StoryRepositoryImpl(get(), get()) }
 }
 
 val useCaseModule = module {
@@ -43,6 +45,7 @@ val useCaseModule = module {
     single { SaveTokenUseCase(get()) }
     single { GetTokenUseCase(get()) }
     single { ClearTokenUseCase(get()) }
+    single { UploadStoryUseCase(get()) }
 }
 
 val viewModelModule = module {
@@ -50,6 +53,7 @@ val viewModelModule = module {
     viewModel { RegisterViewModel(get()) }
     viewModel { StoryViewModel(get()) }
     viewModel { DetailViewModel(get()) }
+    viewModel { UploadViewModel(get()) }
 }
 
 val preferencesModule = module {

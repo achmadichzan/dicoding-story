@@ -4,12 +4,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,7 +49,7 @@ fun DetailScreen(
                 title = { Text("Story Detail") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Back")
                     }
                 }
             )
@@ -70,18 +70,25 @@ fun DetailScreen(
                     ) {
                         SubcomposeAsyncImage(
                             modifier = Modifier.fillMaxWidth()
-                                .height(200.dp),
+                                .wrapContentSize(),
                             model = state.story.photoUrl,
                             contentDescription = state.story.name,
                             loading = {
-                                ShimmerEffect(modifier = Modifier.fillMaxWidth()
-                                    .height(200.dp))
+                                ShimmerEffect(
+                                    modifier = Modifier.fillMaxWidth()
+                                    .wrapContentSize()
+                                )
                             }
                         )
+
                         Text("Name: ${state.story.name}", fontWeight = FontWeight.Bold)
+
                         Text("Description: ${state.story.description}")
+
                         Text("Created At: ${state.story.createdAt}")
+
                         state.story.lat?.let { Text("Lat: $it") }
+
                         state.story.lon?.let { Text("Lon: $it") }
                     }
                 }

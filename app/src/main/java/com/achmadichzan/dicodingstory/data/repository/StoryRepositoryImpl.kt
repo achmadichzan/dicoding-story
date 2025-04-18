@@ -1,12 +1,16 @@
 package com.achmadichzan.dicodingstory.data.repository
 
+import com.achmadichzan.dicodingstory.data.preferences.UserPreferencesImpl
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
+import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.DetailResponse
 import com.achmadichzan.dicodingstory.domain.repository.StoryRepository
+import java.io.File
 
 class StoryRepositoryImpl(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    private val preferences: UserPreferencesImpl
 ) : StoryRepository {
 
     override suspend fun getAllStories(
@@ -24,5 +28,15 @@ class StoryRepositoryImpl(
 
     override suspend fun getStoryDetail(id: String): DetailResponse {
         return apiService.getDetailStory(id)
+    }
+
+    override suspend fun uploadStory(
+        file: File,
+        description: String,
+        lat: Double?,
+        lon: Double?
+    ): BaseResponse {
+        val token = preferences.getToken() ?: throw Exception("No token found")
+        return apiService.uploadStory(token, file, description, lat, lon)
     }
 }

@@ -16,4 +16,7 @@ object Route {
 
     @Serializable
     data class StoryDetail(val id: String)
+
+    @Serializable
+    object AddStory
 }

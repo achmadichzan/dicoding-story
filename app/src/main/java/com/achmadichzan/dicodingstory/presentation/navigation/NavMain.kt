@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.achmadichzan.dicodingstory.domain.usecase.GetTokenUseCase
+import com.achmadichzan.dicodingstory.presentation.screen.AddStoryScreen
 import com.achmadichzan.dicodingstory.presentation.screen.auth.LoginScreen
 import com.achmadichzan.dicodingstory.presentation.screen.auth.RegisterScreen
 import com.achmadichzan.dicodingstory.presentation.screen.detail.DetailScreen
@@ -105,6 +106,10 @@ fun NavMain(
             val id = backstackEntry.arguments?.getString("id") ?: ""
 
             DetailScreen(id = id, navController = navController)
+        }
+
+        composable<Route.AddStory> {
+            AddStoryScreen(navController = navController)
         }
     }
 }
