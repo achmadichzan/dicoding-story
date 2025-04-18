@@ -11,7 +11,7 @@ A simple Android app built using Jetpack Compose that allows users to view, uplo
 - 📌 Story Detail View
 - 📤 Upload Image with Description (from Camera or Gallery)
 - 📍 Optional Location (Lat/Lon) in uploads
-- ☁️ Uses REST API: [Dicoding Story API](https://story-api.dicoding.dev)
+- ☁️ Uses REST API: [Dicoding Story API](https://story-api.dicoding.dev/v1)
 
 ---
 
