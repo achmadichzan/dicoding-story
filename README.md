@@ -48,8 +48,12 @@ cd dicoding-story
 
 Note: The app uses Bearer <token> for authenticated requests, make sure to login or register to obtain one.
 
+---
+
 ## ⚠️ Disclaimer
 This project is for learning purposes and is not currently licensed under any open-source license.
+
+---
 
 ## 🙌 Acknowledgments
 - Dicoding Indonesia for the API & learning path
