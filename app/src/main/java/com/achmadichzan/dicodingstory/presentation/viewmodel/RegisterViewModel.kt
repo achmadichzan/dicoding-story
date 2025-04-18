@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achmadichzan.dicodingstory.domain.usecase.RegisterUseCase
 import com.achmadichzan.dicodingstory.presentation.util.RegisterIntent
-import com.achmadichzan.dicodingstory.presentation.util.RegisterState
+import com.achmadichzan.dicodingstory.presentation.state.RegisterState
 import kotlinx.coroutines.launch
 
 class RegisterViewModel(

@@ -10,7 +10,7 @@ import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.usecase.LoginUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.SaveTokenUseCase
 import com.achmadichzan.dicodingstory.presentation.util.LoginIntent
-import com.achmadichzan.dicodingstory.presentation.util.LoginState
+import com.achmadichzan.dicodingstory.presentation.state.LoginState
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.launch

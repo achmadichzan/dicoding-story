@@ -1,4 +1,4 @@
-package com.achmadichzan.dicodingstory.presentation.util
+package com.achmadichzan.dicodingstory.presentation.state
 
 data class UploadState(
     val isLoading: Boolean = false,

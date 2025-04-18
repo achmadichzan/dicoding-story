@@ -1,5 +1,7 @@
-package com.achmadichzan.dicodingstory.presentation.screen
+package com.achmadichzan.dicodingstory.presentation.screen.addstory
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,9 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.achmadichzan.dicodingstory.presentation.screen.CameraXScreen
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
 import com.achmadichzan.dicodingstory.presentation.viewmodel.UploadViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -59,6 +64,18 @@ fun AddStoryScreen(
 
     val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
 
+    var showCameraX by remember { mutableStateOf(false) }
+
+    if (showCameraX) {
+        CameraXScreen(
+            onImageCaptured = {
+                file = it
+                imageUri = it.toUri()
+                showCameraX = false
+            },
+            onBack = { showCameraX = false }
+        )
+    } else {
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
@@ -76,6 +93,16 @@ fun AddStoryScreen(
                 imageUri = uri
                 file = FileUtil.from(context, uri)
             }
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showCameraX = true
+        } else {
+            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -137,11 +164,26 @@ fun AddStoryScreen(
                         )
                     )
                 }) {
-                    Text("From Gallery")
+                    Text("Gallery")
                 }
                 OutlinedButton(onClick = { launchCamera() }) {
-                    Text("From Camera")
+                    Text("Camera")
                 }
+
+                OutlinedButton(onClick = {
+                    when (PackageManager.PERMISSION_GRANTED) {
+                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                            showCameraX = true
+                        }
+                        else -> {
+                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                        }
+                    }
+                }) {
+                    Text("CameraX")
+                }
+
+
             }
 
             Spacer(Modifier.height(16.dp))
@@ -172,6 +214,8 @@ fun AddStoryScreen(
                 Text(it, color = Color.Red)
             }
         }
+    }
+
     }
 }
 

@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achmadichzan.dicodingstory.domain.usecase.UploadStoryUseCase
-import com.achmadichzan.dicodingstory.presentation.util.UploadState
+import com.achmadichzan.dicodingstory.presentation.state.UploadState
 import kotlinx.coroutines.launch
 import java.io.File
 
