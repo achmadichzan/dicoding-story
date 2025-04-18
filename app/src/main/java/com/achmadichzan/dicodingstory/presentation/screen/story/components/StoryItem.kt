@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.SubcomposeAsyncImage
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
+import com.achmadichzan.dicodingstory.presentation.components.ShimmerEffect
 
 @Composable
 fun StoryItem(story: StoryDto, onClick: () -> Unit) {
@@ -28,6 +30,16 @@ fun StoryItem(story: StoryDto, onClick: () -> Unit) {
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            SubcomposeAsyncImage(
+                modifier = Modifier.fillMaxWidth()
+                    .height(200.dp),
+                model = story.photoUrl,
+                contentDescription = story.name,
+                loading = {
+                    ShimmerEffect(modifier = Modifier.fillMaxWidth()
+                        .height(200.dp))
+                }
+            )
             Text(text = story.name, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Spacer(modifier = Modifier.height(4.dp))
             Text(text = story.description)

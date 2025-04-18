@@ -2,6 +2,7 @@ package com.achmadichzan.dicodingstory.presentation.screen.detail
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -24,7 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
+import coil3.compose.SubcomposeAsyncImage
+import com.achmadichzan.dicodingstory.presentation.components.ShimmerEffect
 import com.achmadichzan.dicodingstory.presentation.viewmodel.DetailViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -52,8 +54,11 @@ fun DetailScreen(
                 }
             )
         }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier.padding(innerPadding)
+                .fillMaxSize()
+        ) {
             when {
                 state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
                 state.error != null -> Text("Error: ${state.error}", color = Color.Red)
@@ -63,10 +68,15 @@ fun DetailScreen(
                             .padding(16.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        AsyncImage(
+                        SubcomposeAsyncImage(
+                            modifier = Modifier.fillMaxWidth()
+                                .height(200.dp),
                             model = state.story.photoUrl,
                             contentDescription = state.story.name,
-                            modifier = Modifier.fillMaxWidth().height(200.dp)
+                            loading = {
+                                ShimmerEffect(modifier = Modifier.fillMaxWidth()
+                                    .height(200.dp))
+                            }
                         )
                         Text("Name: ${state.story.name}", fontWeight = FontWeight.Bold)
                         Text("Description: ${state.story.description}")
