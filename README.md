@@ -59,3 +59,9 @@ This project is for learning purposes and is not currently licensed under any op
 - Dicoding Indonesia for the API & learning path
 - Google & Android Open Source Projects
 - Jetpack Compose & Ktor Communities
+
+# 📱 Demo App
+---
+https://github.com/user-attachments/assets/3a670555-9694-4136-8b3d-c709dee158f9
+
+
