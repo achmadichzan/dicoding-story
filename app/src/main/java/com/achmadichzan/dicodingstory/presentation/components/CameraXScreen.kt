@@ -1,4 +1,4 @@
-package com.achmadichzan.dicodingstory.presentation.screen
+package com.achmadichzan.dicodingstory.presentation.components
 
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture

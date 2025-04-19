@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.achmadichzan.dicodingstory.R
+import com.achmadichzan.dicodingstory.domain.model.LoginResult
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
 import com.achmadichzan.dicodingstory.presentation.navigation.Route
 import com.achmadichzan.dicodingstory.presentation.screen.story.components.StoryItem
@@ -46,7 +47,7 @@ import org.koin.compose.getKoin
 fun StoryScreen(
     navController: NavHostController,
     viewModel: StoryViewModel = koinViewModel(),
-    token: String
+    token: String,
 ) {
     val state = viewModel.state
     val clearTokenUseCase: ClearTokenUseCase = getKoin().get()
@@ -95,11 +96,12 @@ fun StoryScreen(
         }
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+
             if (isLoggingOut) {
                 AlertDialog(
                     onDismissRequest = { isLoggingOut = false },
-                    title = { Text("Logging Out") },
-                    text = { Text("Are you sure you want to log out?") },
+                    title = { Text("Keluar") },
+                    text = { Text("Yakin ingin keluar?") },
                     confirmButton = {
                         TextButton( onClick = {
                             scope.launch {
@@ -113,24 +115,26 @@ fun StoryScreen(
                             }
 
                         }) {
-                            Text("Log Out")
+                            Text("Keluar")
                         }
 
                     },
                     dismissButton = {
                         TextButton(onClick = { isLoggingOut = false }) {
-                            Text("Cancel")
+                            Text("Batalkan")
                         }
                     }
                 )
             }
             when {
                 state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+
                 state.error != null -> Text(
                     text = "Error: ${state.error}",
                     color = Color.Red,
                     modifier = Modifier.align(Alignment.Center)
                 )
+
                 else -> LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
                     contentPadding = PaddingValues(vertical = 8.dp)
@@ -155,4 +159,3 @@ fun StoryScreen(
         }
     }
 }
-

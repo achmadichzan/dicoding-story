@@ -23,7 +23,7 @@ class DicodingStoryApp: Application() {
 
         CoroutineScope(Dispatchers.Default).launch {
             val pref = UserPreferencesImpl(this@DicodingStoryApp)
-            SessionManager.token = pref.getToken()
+            SessionManager.token = pref.getToken().toString()
         }
     }
 }

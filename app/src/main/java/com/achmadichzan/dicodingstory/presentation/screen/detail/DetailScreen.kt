@@ -22,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -61,11 +62,13 @@ fun DetailScreen(
         ) {
             when {
                 state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
+
                 state.error != null -> Text("Error: ${state.error}", color = Color.Red)
+
                 state.story != null -> {
                     Column(
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp)
                             .verticalScroll(rememberScrollState())
                     ) {
                         SubcomposeAsyncImage(
@@ -76,9 +79,10 @@ fun DetailScreen(
                             loading = {
                                 ShimmerEffect(
                                     modifier = Modifier.fillMaxWidth()
-                                    .wrapContentSize()
+                                        .wrapContentSize()
                                 )
-                            }
+                            },
+                            contentScale = ContentScale.FillWidth
                         )
 
                         Text("Name: ${state.story.name}", fontWeight = FontWeight.Bold)

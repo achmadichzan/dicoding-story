@@ -43,7 +43,7 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
-import com.achmadichzan.dicodingstory.presentation.screen.CameraXScreen
+import com.achmadichzan.dicodingstory.presentation.components.CameraXScreen
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
 import com.achmadichzan.dicodingstory.presentation.viewmodel.UploadViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -76,146 +76,145 @@ fun AddStoryScreen(
             onBack = { showCameraX = false }
         )
     } else {
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri: Uri? ->
-        uri?.let {
-            imageUri = it
-            file = FileUtil.from(context, it)
-        }
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        if (success) {
-            cameraImageUri.value?.let { uri ->
-                imageUri = uri
-                file = FileUtil.from(context, uri)
+        val galleryLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) { uri: Uri? ->
+            uri?.let {
+                imageUri = it
+                file = FileUtil.from(context, it)
             }
         }
-    }
 
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            showCameraX = true
-        } else {
-            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+        val cameraLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicture()
+        ) { success ->
+            if (success) {
+                cameraImageUri.value?.let { uri ->
+                    imageUri = uri
+                    file = FileUtil.from(context, uri)
+                }
+            }
         }
-    }
 
-    val launchCamera: () -> Unit = {
-        val tempFile = FileUtil.createImageFile(context)
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            tempFile
-        )
-        cameraImageUri.value = uri
-        file = tempFile
-        cameraLauncher.launch(uri)
-    }
-
-    LaunchedEffect(state.success) {
-        state.success?.let {
-            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            navController.popBackStack()
+        val cameraPermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                showCameraX = true
+            } else {
+                Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
+            }
         }
-    }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Back")
-                    }
-                },
-                title = { Text("Upload Story") }
+        val launchCamera: () -> Unit = {
+            val tempFile = FileUtil.createImageFile(context)
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                tempFile
             )
+            cameraImageUri.value = uri
+            file = tempFile
+            cameraLauncher.launch(uri)
         }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            imageUri?.let {
-                SubcomposeAsyncImage(
-                    model = it,
-                    contentDescription = "Selected Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
+
+        LaunchedEffect(state.success) {
+            state.success?.let {
+                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                navController.popBackStack()
+            }
+        }
+
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Back")
+                        }
+                    },
+                    title = { Text("Upload Story") }
                 )
             }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                OutlinedButton(onClick = {
-                    galleryLauncher.launch(
-                        PickVisualMediaRequest(
-                            ActivityResultContracts.PickVisualMedia.ImageOnly
-                        )
+                imageUri?.let {
+                    SubcomposeAsyncImage(
+                        model = it,
+                        contentDescription = "Selected Image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
                     )
-                }) {
-                    Text("Gallery")
-                }
-                OutlinedButton(onClick = { launchCamera() }) {
-                    Text("Camera")
                 }
 
-                OutlinedButton(onClick = {
-                    when (PackageManager.PERMISSION_GRANTED) {
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
-                            showCameraX = true
-                        }
-                        else -> {
-                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    OutlinedButton(onClick = {
+                        galleryLauncher.launch(
+                            PickVisualMediaRequest(
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
+                    }) {
+                        Text("Gallery")
                     }
-                }) {
-                    Text("CameraX")
+                    OutlinedButton(onClick = { launchCamera() }) {
+                        Text("Camera")
+                    }
+
+                    OutlinedButton(onClick = {
+                        when (PackageManager.PERMISSION_GRANTED) {
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                                showCameraX = true
+                            }
+                            else -> {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                    }) {
+                        Text("CameraX")
+                    }
+
+
                 }
 
+                Spacer(Modifier.height(16.dp))
 
-            }
+                OutlinedTextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(10.dp)
+                )
 
-            Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(10.dp)
-            )
+                Button(
+                    onClick = {
+                        file?.let {
+                            viewModel.uploadStory(it, description, null, null)
+                        }
+                    },
+                    enabled = file != null && description.isNotEmpty() && !state.isLoading,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(if (state.isLoading) "Uploading..." else "Upload")
+                }
 
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    file?.let {
-                        viewModel.uploadStory(it, description, null, null)
-                    }
-                },
-                enabled = file != null && description.isNotEmpty() && !state.isLoading,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(if (state.isLoading) "Uploading..." else "Upload")
-            }
-
-            state.error?.let {
-                Text(it, color = Color.Red)
+                state.error?.let {
+                    Text(it, color = Color.Red)
+                }
             }
         }
-    }
-
     }
 }
 

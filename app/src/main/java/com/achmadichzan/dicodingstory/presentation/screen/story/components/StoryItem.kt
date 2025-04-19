@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -43,7 +44,7 @@ fun StoryItem(story: StoryDto, onClick: () -> Unit) {
 
             SubcomposeAsyncImage(
                 modifier = Modifier.fillMaxWidth()
-                    .wrapContentSize(),
+                    .height(200.dp),
                 model = story.photoUrl,
                 contentDescription = story.name,
                 loading = {
@@ -52,7 +53,7 @@ fun StoryItem(story: StoryDto, onClick: () -> Unit) {
                         .wrapContentSize()
                     )
                 },
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.FillWidth
             )
 
             Text(
