@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.achmadichzan.dicodingstory.R
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
 import com.achmadichzan.dicodingstory.presentation.navigation.Route
@@ -146,7 +148,11 @@ fun StoryScreen(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
-                    items(count = pagingStories.itemCount) { index ->
+                    items(
+                        count = pagingStories.itemCount,
+                        key = { index -> pagingStories[index]?.id ?: index },
+                        contentType = pagingStories.itemContentType { "StoryPagingItems" }
+                    ) { index ->
                         pagingStories[index]?.let { story ->
                             StoryItem(
                                 story = story,
