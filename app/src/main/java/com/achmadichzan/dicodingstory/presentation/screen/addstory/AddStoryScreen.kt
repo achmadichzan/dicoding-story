@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,12 +38,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
+import com.achmadichzan.dicodingstory.R
 import com.achmadichzan.dicodingstory.presentation.components.CameraXScreen
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
 import com.achmadichzan.dicodingstory.presentation.viewmodel.UploadViewModel
@@ -81,7 +84,8 @@ fun AddStoryScreen(
         ) { uri: Uri? ->
             uri?.let {
                 imageUri = it
-                file = FileUtil.from(context, it)
+                val originalFile = FileUtil.from(context, it)
+                file = FileUtil.compressImageFile(context, originalFile)
             }
         }
 
@@ -91,7 +95,8 @@ fun AddStoryScreen(
             if (success) {
                 cameraImageUri.value?.let { uri ->
                     imageUri = uri
-                    file = FileUtil.from(context, uri)
+                    val originalFile = FileUtil.from(context, uri)
+                    file = FileUtil.compressImageFile(context, originalFile)
                 }
             }
         }
@@ -147,11 +152,14 @@ fun AddStoryScreen(
                     SubcomposeAsyncImage(
                         model = it,
                         contentDescription = "Selected Image",
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                             .height(200.dp)
                     )
-                }
+                } ?: Image(
+                    painter = painterResource(R.drawable.add_photo_50),
+                    contentDescription = "Upload Image",
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
