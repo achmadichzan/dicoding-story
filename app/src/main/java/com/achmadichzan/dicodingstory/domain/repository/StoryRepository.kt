@@ -11,8 +11,8 @@ import java.io.File
 interface StoryRepository {
     suspend fun getAllStories(
         token: String? = null,
-        page: Int? = 1,
-        size: Int? = 20,
+        page: Int? = null,
+        size: Int? = null,
         location: Int? = null
     ): List<StoryDto>
 

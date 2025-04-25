@@ -25,7 +25,12 @@ class StoryViewModel(
     var state by mutableStateOf(StoryState())
         private set
 
-    fun loadStories(token: String? = null, page: Int? = 1, size: Int? = 20, location: Int? = null) {
+    fun loadStories(
+        token: String? = null,
+        page: Int? = null,
+        size: Int? = null,
+        location: Int? = null
+    ) {
         viewModelScope.launch {
             state = state.copy(isLoading = true)
             try {

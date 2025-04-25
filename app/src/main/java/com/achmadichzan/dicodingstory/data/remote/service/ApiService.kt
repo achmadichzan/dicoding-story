@@ -38,14 +38,14 @@ class ApiService(
         return client.post("v1/login") {
             contentType(ContentType.Application.Json)
             setBody(request)
-        }.body<LoginResponse>()
+        }.body()
     }
 
     suspend fun getStories(
         token: String? = null,
-        page: Int? = 1,
-        size: Int? = 20,
-        location: Int? = null
+        page: Int? = null,
+        size: Int? = null,
+        location: Int? = 1
     ): StoryResponse {
         val userToken = preferences.getToken() ?: token
         return client.get("v1/stories") {
@@ -91,5 +91,4 @@ class ApiService(
 
         return response
     }
-
 }

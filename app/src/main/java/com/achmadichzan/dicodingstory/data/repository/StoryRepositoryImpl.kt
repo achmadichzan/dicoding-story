@@ -50,26 +50,16 @@ class StoryRepositoryImpl(
         return apiService.uploadStory(token, file, description, lat, lon)
     }
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun getPagedStories(token: String): Flow<PagingData<StoryEntity>> {
-        val storyDao = database.storyDao()
-        val remoteKeysDao = database.remoteKeysDao()
-
+        @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(pageSize = 10),
             remoteMediator = StoryRemoteMediator(
-                storyDao = storyDao,
-                remoteKeysDao = remoteKeysDao,
-                api = { page, size ->
-                    apiService.getStories(
-                        token = token,
-                        page = page,
-                        size = size
-                    )
-                }
+                database = database,
+                apiService = apiService
             ),
             pagingSourceFactory = {
-                storyDao.getStories()
+                database.storyDao().getStories()
             }
         ).flow
     }

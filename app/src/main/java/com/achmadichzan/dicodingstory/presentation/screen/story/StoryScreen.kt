@@ -1,5 +1,7 @@
 package com.achmadichzan.dicodingstory.presentation.screen.story
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -155,6 +157,12 @@ fun StoryScreen(
                     ) { index ->
                         pagingStories[index]?.let { story ->
                             StoryItem(
+                                modifier = Modifier.animateItem(
+                                    placementSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessLow
+                                    )
+                                ),
                                 story = story,
                                 onClick = {
                                     navController.navigate(Route.StoryDetail(story.id)) {

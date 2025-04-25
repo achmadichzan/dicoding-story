@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +22,9 @@ import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.presentation.components.ShimmerEffect
 
 @Composable
-fun StoryItem(story: StoryDto, onClick: () -> Unit) {
+fun StoryItem(modifier: Modifier = Modifier, story: StoryDto, onClick: () -> Unit) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(bottom = 8.dp)

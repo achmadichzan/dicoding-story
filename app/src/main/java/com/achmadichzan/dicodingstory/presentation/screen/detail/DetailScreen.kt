@@ -49,7 +49,7 @@ fun DetailScreen(
             TopAppBar(
                 title = { Text("Story Detail") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Back")
                     }
                 }
