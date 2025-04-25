@@ -1,6 +1,6 @@
 package com.achmadichzan.dicodingstory.data.remote.service
 
-import com.achmadichzan.dicodingstory.data.preferences.UserPreferencesImpl
+import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.DetailResponse
 import com.achmadichzan.dicodingstory.domain.model.LoginRequest
@@ -43,8 +43,8 @@ class ApiService(
 
     suspend fun getStories(
         token: String? = null,
-        page: Int? = null,
-        size: Int? = null,
+        page: Int? = 1,
+        size: Int? = 20,
         location: Int? = null
     ): StoryResponse {
         val userToken = preferences.getToken() ?: token

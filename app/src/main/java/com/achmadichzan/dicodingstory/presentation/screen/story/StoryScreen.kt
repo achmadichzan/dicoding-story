@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material3.AlertDialog
@@ -31,8 +30,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.achmadichzan.dicodingstory.R
-import com.achmadichzan.dicodingstory.domain.model.LoginResult
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
 import com.achmadichzan.dicodingstory.presentation.navigation.Route
 import com.achmadichzan.dicodingstory.presentation.screen.story.components.StoryItem
@@ -53,6 +53,8 @@ fun StoryScreen(
     val clearTokenUseCase: ClearTokenUseCase = getKoin().get()
     val scope = rememberCoroutineScope()
     var isLoggingOut by remember { mutableStateOf(false) }
+
+    val pagingStories = viewModel.getPagedStories(token).collectAsLazyPagingItems()
 
     LaunchedEffect(Unit) {
         viewModel.loadStories(token)
@@ -95,7 +97,12 @@ fun StoryScreen(
             }
         }
     ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentAlignment = Alignment.CenterStart
+        ) {
 
             if (isLoggingOut) {
                 AlertDialog(
@@ -139,20 +146,36 @@ fun StoryScreen(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
                     contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
-                    items(
-                        items = state.stories,
-                        key = { it.id }
-                    ) { story ->
-                        StoryItem(story = story, onClick = {
-                            navController.navigate(Route.StoryDetail(story.id)) {
-                                popUpTo(Route.Story) {
-                                    inclusive = false
-                                    saveState = true
+                    items(count = pagingStories.itemCount) { index ->
+                        pagingStories[index]?.let { story ->
+                            StoryItem(
+                                story = story,
+                                onClick = {
+                                    navController.navigate(Route.StoryDetail(story.id)) {
+                                        popUpTo(Route.Story) {
+                                            inclusive = false
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
                                 }
-                                launchSingleTop = true
-                                restoreState = false
+                            )
+                        }
+                    }
+
+                    pagingStories.apply {
+                        when {
+                            loadState.refresh is LoadState.Loading -> {
+                                item { CircularProgressIndicator(Modifier.align(Alignment.Center)) }
                             }
-                        })
+                            loadState.append is LoadState.Loading -> {
+                                item { CircularProgressIndicator(Modifier.align(Alignment.Center)) }
+                            }
+                            loadState.refresh is LoadState.Error -> {
+                                item { Text("Error: ${(loadState.refresh as LoadState.Error).error.localizedMessage}") }
+                            }
+                        }
                     }
                 }
             }

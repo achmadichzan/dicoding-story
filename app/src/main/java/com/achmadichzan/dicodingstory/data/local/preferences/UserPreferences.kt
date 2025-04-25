@@ -1,4 +1,4 @@
-package com.achmadichzan.dicodingstory.data.local
+package com.achmadichzan.dicodingstory.data.local.preferences
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit

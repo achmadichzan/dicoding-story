@@ -43,8 +43,8 @@ A simple Android app built using Jetpack Compose that allows users to view, uplo
 git clone https://github.com/your-username/dicoding-story.git
 cd dicoding-story
 ```
-2. **Open with Android Studio**
-3. **Set up your API base URL and token handling if needed**
+1. **Open with Android Studio**
+2. **Set up your API base URL and token handling if needed**
 
 Note: The app uses Bearer <token> for authenticated requests, make sure to login or register to obtain one.
 

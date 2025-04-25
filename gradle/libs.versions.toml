@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.0"
+agp = "8.9.1"
 kotlin = "2.1.10"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -7,16 +7,17 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 androidxLifecycle = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2025.04.00"
+composeBom = "2025.04.01"
 kspVersion = "2.1.0-1.0.29"
 koin = "4.0.4"
 ktor = "3.1.2"
 materialIconsExtended = "1.7.8"
+pagingRuntime = "3.3.6"
 slf4jSimple = "2.0.17"
 navigationCompose = "2.8.9"
-coreSplashscreen = "1.2.0-beta01"
+coreSplashscreen = "1.2.0-beta02"
 coilCompose = "3.1.0"
-room = "2.7.0"
+room = "2.7.1"
 datastorePreferences = "1.1.4"
 cameraxVersion = "1.4.2"
 
@@ -61,6 +62,11 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 
+# Paging3
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingRuntime" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntime" }
+androidx-paging-runtime-ktx = { module = "androidx.paging:paging-runtime-ktx", version.ref = "pagingRuntime" }
+
 # Preferences
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 
@@ -69,8 +75,8 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 # CameraX
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "cameraxVersion" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
-camera-lifecycle        = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraxVersion" }
-camera-view             = { module = "androidx.camera:camera-view", version.ref = "cameraxVersion" }
+camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraxVersion" }
+camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraxVersion" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -130,6 +136,11 @@ room = [
     "room-runtime",
     "room-ktx",
     "room-paging"
+]
+paging3 = [
+    "androidx-paging-compose",
+    "androidx-paging-runtime",
+    "androidx-paging-runtime-ktx"
 ]
 camera = [
     "androidx-camera-core",

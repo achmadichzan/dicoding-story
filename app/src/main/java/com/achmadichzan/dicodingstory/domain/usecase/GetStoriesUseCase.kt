@@ -8,8 +8,8 @@ class GetStoriesUseCase(
 ) {
     suspend operator fun invoke(
         token: String? = null,
-        page: Int? = null,
-        size: Int? = null,
+        page: Int? = 1,
+        size: Int? = 20,
         location: Int? = null
     ): List<StoryDto> {
         return repository.getAllStories(token, page, size, location)

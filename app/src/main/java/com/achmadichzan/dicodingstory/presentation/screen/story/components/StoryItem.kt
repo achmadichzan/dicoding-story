@@ -50,7 +50,7 @@ fun StoryItem(story: StoryDto, onClick: () -> Unit) {
                 loading = {
                     ShimmerEffect(
                         modifier = Modifier.fillMaxWidth()
-                        .wrapContentSize()
+                            .height(200.dp)
                     )
                 },
                 contentScale = ContentScale.FillWidth

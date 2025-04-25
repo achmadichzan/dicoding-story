@@ -1,8 +1,8 @@
 package com.achmadichzan.dicodingstory
 
 import android.app.Application
-import com.achmadichzan.dicodingstory.data.di.appModule
-import com.achmadichzan.dicodingstory.data.preferences.UserPreferencesImpl
+import com.achmadichzan.dicodingstory.di.appModule
+import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
 import com.achmadichzan.dicodingstory.presentation.util.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

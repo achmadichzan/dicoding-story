@@ -82,6 +82,9 @@ dependencies {
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
 
+    // Paging3
+    implementation(libs.bundles.paging3)
+
     // Data Store
     implementation(libs.androidx.datastore.preferences)
 

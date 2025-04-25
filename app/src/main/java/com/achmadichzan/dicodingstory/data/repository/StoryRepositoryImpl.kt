@@ -1,16 +1,26 @@
 package com.achmadichzan.dicodingstory.data.repository
 
-import com.achmadichzan.dicodingstory.data.preferences.UserPreferencesImpl
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
+import com.achmadichzan.dicodingstory.data.local.room.StoryDao
+import com.achmadichzan.dicodingstory.data.local.room.StoryDatabase
+import com.achmadichzan.dicodingstory.data.local.room.StoryEntity
+import com.achmadichzan.dicodingstory.data.local.room.StoryRemoteMediator
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.DetailResponse
 import com.achmadichzan.dicodingstory.domain.repository.StoryRepository
+import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 class StoryRepositoryImpl(
     private val apiService: ApiService,
-    private val preferences: UserPreferencesImpl
+    private val preferences: UserPreferencesImpl,
+    private val database: StoryDatabase
 ) : StoryRepository {
 
     override suspend fun getAllStories(
@@ -38,5 +48,29 @@ class StoryRepositoryImpl(
     ): BaseResponse {
         val token = preferences.getToken() ?: throw Exception("No token found")
         return apiService.uploadStory(token, file, description, lat, lon)
+    }
+
+    @OptIn(ExperimentalPagingApi::class)
+    override fun getPagedStories(token: String): Flow<PagingData<StoryEntity>> {
+        val storyDao = database.storyDao()
+        val remoteKeysDao = database.remoteKeysDao()
+
+        return Pager(
+            config = PagingConfig(pageSize = 10),
+            remoteMediator = StoryRemoteMediator(
+                storyDao = storyDao,
+                remoteKeysDao = remoteKeysDao,
+                api = { page, size ->
+                    apiService.getStories(
+                        token = token,
+                        page = page,
+                        size = size
+                    )
+                }
+            ),
+            pagingSourceFactory = {
+                storyDao.getStories()
+            }
+        ).flow
     }
 }

@@ -1,6 +1,8 @@
-package com.achmadichzan.dicodingstory.data.di
+package com.achmadichzan.dicodingstory.di
 
-import com.achmadichzan.dicodingstory.data.preferences.UserPreferencesImpl
+import androidx.room.Room
+import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
+import com.achmadichzan.dicodingstory.data.local.room.StoryDatabase
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 import com.achmadichzan.dicodingstory.data.remote.service.provideHttpClient
 import com.achmadichzan.dicodingstory.data.repository.AuthRepositoryImpl
@@ -9,6 +11,7 @@ import com.achmadichzan.dicodingstory.domain.repository.AuthRepository
 import com.achmadichzan.dicodingstory.domain.repository.StoryRepository
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetDetailStoryUseCase
+import com.achmadichzan.dicodingstory.domain.usecase.GetPagingStoryUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetStoriesUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetTokenUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.LoginUseCase
@@ -34,7 +37,7 @@ val authModule = module {
 }
 
 val storyModule = module {
-    single<StoryRepository> { StoryRepositoryImpl(get(), get()) }
+    single<StoryRepository> { StoryRepositoryImpl(get(), get(), get()) }
 }
 
 val useCaseModule = module {
@@ -46,14 +49,28 @@ val useCaseModule = module {
     single { GetTokenUseCase(get()) }
     single { ClearTokenUseCase(get()) }
     single { UploadStoryUseCase(get()) }
+    single { GetPagingStoryUseCase(get()) }
 }
 
 val viewModelModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { RegisterViewModel(get()) }
-    viewModel { StoryViewModel(get()) }
+    viewModel { StoryViewModel(get(), get()) }
     viewModel { DetailViewModel(get()) }
     viewModel { UploadViewModel(get()) }
+}
+
+val databaseModule = module {
+    single<StoryDatabase> {
+        Room.databaseBuilder(
+            androidContext(),
+            StoryDatabase::class.java,
+            "story_database"
+        ).build()
+    }
+
+    single { get<StoryDatabase>().storyDao() }
+    single { get<StoryDatabase>().remoteKeysDao() }
 }
 
 val preferencesModule = module {
@@ -66,5 +83,6 @@ val appModule = listOf(
     storyModule,
     useCaseModule,
     viewModelModule,
+    databaseModule,
     preferencesModule
 )
