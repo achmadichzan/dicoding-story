@@ -178,17 +178,9 @@ fun StoryScreen(
                         }
                     }
 
-                    pagingStories.apply {
-                        when {
-                            loadState.refresh is LoadState.Loading -> {
-                                item { CircularProgressIndicator(Modifier.align(Alignment.Center)) }
-                            }
-                            loadState.append is LoadState.Loading -> {
-                                item { CircularProgressIndicator(Modifier.align(Alignment.Center)) }
-                            }
-                            loadState.refresh is LoadState.Error -> {
-                                item { Text("Error: ${(loadState.refresh as LoadState.Error).error.localizedMessage}") }
-                            }
+                    item {
+                        if (pagingStories.loadState.append is LoadState.Loading) {
+                            CircularProgressIndicator(Modifier.align(Alignment.Center))
                         }
                     }
                 }
