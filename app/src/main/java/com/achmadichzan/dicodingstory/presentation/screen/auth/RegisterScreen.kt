@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +27,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,9 +43,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalAutofillManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentType
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -76,6 +82,7 @@ fun RegisterScreen(
         label = "offsetX"
     )
 
+    val autoFill = LocalAutofillManager.current
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -140,6 +147,7 @@ fun RegisterScreen(
                 label = { Text("Email") },
                 isError = emailError != null,
                 supportingText = { if (emailError != null) { Text(emailError!!) } },
+                modifier = Modifier.semantics { contentType = ContentType.EmailAddress }
             )
 
             PasswordTextField(
@@ -166,18 +174,27 @@ fun RegisterScreen(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(imageVector = image, contentDescription = description)
                     }
-                }
+                },
+                modifier = Modifier.semantics { contentType = ContentType.Password }
             )
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
                     viewModel.onIntent(RegisterIntent.Submit(name, email, password))
+                    autoFill?.commit()
                 },
                 enabled = email.isNotEmpty() && password.isNotEmpty() && !state.isLoading
                         && passwordError == null && emailError == null,
             ) {
-                Text(if (state.isLoading) "Mendaftar..." else "Daftar")
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        strokeWidth = 3.dp
+                    )
+                } else {
+                    Text("Daftar")
+                }
             }
 
             TextButton(

@@ -5,6 +5,7 @@ import com.achmadichzan.dicodingstory.domain.model.LoginRequest
 import com.achmadichzan.dicodingstory.domain.model.LoginResult
 import com.achmadichzan.dicodingstory.domain.model.RegisterRequest
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
+import com.achmadichzan.dicodingstory.domain.model.LoginResponse
 import com.achmadichzan.dicodingstory.domain.repository.AuthRepository
 
 class AuthRepositoryImpl(
@@ -15,7 +16,7 @@ class AuthRepositoryImpl(
         return apiService.register(RegisterRequest(name, email, password))
     }
 
-    override suspend fun login(email: String, password: String): LoginResult? {
-        return apiService.login(LoginRequest(email, password)).loginResult
+    override suspend fun login(email: String, password: String): LoginResponse {
+        return apiService.login(LoginRequest(email, password))
     }
 }

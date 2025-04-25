@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun EmailTextField(
+    modifier: Modifier = Modifier,
     email: String,
     onValueChange: (String) -> Unit,
     label: @Composable (() -> Unit)? = null,
@@ -22,7 +23,7 @@ fun EmailTextField(
 ) {
 
     OutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         value = email,
         onValueChange = onValueChange,
         label = label,
