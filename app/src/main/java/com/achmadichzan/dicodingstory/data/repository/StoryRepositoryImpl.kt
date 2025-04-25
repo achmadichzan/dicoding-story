@@ -8,7 +8,7 @@ import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
 import com.achmadichzan.dicodingstory.data.local.room.StoryDao
 import com.achmadichzan.dicodingstory.data.local.room.StoryDatabase
 import com.achmadichzan.dicodingstory.data.local.room.StoryEntity
-import com.achmadichzan.dicodingstory.data.local.room.StoryRemoteMediator
+import com.achmadichzan.dicodingstory.data.remote.paging.StoryRemoteMediator
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
@@ -22,19 +22,6 @@ class StoryRepositoryImpl(
     private val preferences: UserPreferencesImpl,
     private val database: StoryDatabase
 ) : StoryRepository {
-
-    override suspend fun getAllStories(
-        token: String?,
-        page: Int?,
-        size: Int?,
-        location: Int?
-    ): List<StoryDto> {
-        val response = apiService.getStories(token, page, size, location)
-        if (response.error) {
-            throw Exception(response.message)
-        }
-        return response.listStory
-    }
 
     override suspend fun getStoryDetail(id: String): DetailResponse {
         return apiService.getDetailStory(id)

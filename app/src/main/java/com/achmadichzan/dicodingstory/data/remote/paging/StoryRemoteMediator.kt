@@ -1,4 +1,4 @@
-package com.achmadichzan.dicodingstory.data.local.room
+package com.achmadichzan.dicodingstory.data.remote.paging
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
@@ -6,6 +6,9 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.achmadichzan.dicodingstory.data.local.mapper.toEntity
+import com.achmadichzan.dicodingstory.data.local.room.RemoteKeys
+import com.achmadichzan.dicodingstory.data.local.room.StoryDatabase
+import com.achmadichzan.dicodingstory.data.local.room.StoryEntity
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 
 @OptIn(ExperimentalPagingApi::class)
@@ -44,7 +47,7 @@ class StoryRemoteMediator(
         try {
             val response = apiService.getStories(page = page, size = state.config.pageSize)
             val stories = response.listStory.map { it.toEntity() }
-            val endOfPaginationReached = stories.isEmpty()
+            val endOfPaginationReached = stories.size < state.config.pageSize
 
             database.withTransaction {
                 if (loadType == LoadType.REFRESH) {

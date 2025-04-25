@@ -7,11 +7,14 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,47 +68,53 @@ fun CameraXScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        AndroidView(
-            factory = { previewView },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-        )
-
-        Button(
-            onClick = {
-                val photoFile = FileUtil.createImageFile(context)
-                val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-                imageCapture?.takePicture(
-                    outputOptions,
-                    ContextCompat.getMainExecutor(context),
-                    object : ImageCapture.OnImageSavedCallback {
-                        override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                            onImageCaptured(photoFile)
-                        }
-
-                        override fun onError(exception: ImageCaptureException) {
-                            exception.printStackTrace()
-                        }
-                    }
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+    Scaffold(contentWindowInsets = WindowInsets.safeContent) { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)
+            .fillMaxSize()
         ) {
-            Text("Capture")
-        }
+            AndroidView(
+                factory = { previewView },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
 
-        OutlinedButton(
-            onClick = onBack,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            Text("Back")
+            Button(
+                onClick = {
+                    val photoFile = FileUtil.createImageFile(context)
+                    val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+                    imageCapture?.takePicture(
+                        outputOptions,
+                        ContextCompat.getMainExecutor(context),
+                        object : ImageCapture.OnImageSavedCallback {
+                            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                                val compressedFile = FileUtil.compressImageFile(context, photoFile)
+                                onImageCaptured(compressedFile)
+                            }
+
+                            override fun onError(exception: ImageCaptureException) {
+                                exception.printStackTrace()
+                            }
+                        }
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Capture")
+            }
+
+
+            OutlinedButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
+                Text("Back")
+            }
         }
     }
 }

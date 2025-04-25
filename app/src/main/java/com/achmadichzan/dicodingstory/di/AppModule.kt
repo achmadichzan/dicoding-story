@@ -12,7 +12,6 @@ import com.achmadichzan.dicodingstory.domain.repository.StoryRepository
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetDetailStoryUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetPagingStoryUseCase
-import com.achmadichzan.dicodingstory.domain.usecase.GetStoriesUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetTokenUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.LoginUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.RegisterUseCase
@@ -43,7 +42,6 @@ val storyModule = module {
 val useCaseModule = module {
     factory { LoginUseCase(get()) }
     factory { RegisterUseCase(get()) }
-    factory { GetStoriesUseCase(get()) }
     single { GetDetailStoryUseCase(get()) }
     single { SaveTokenUseCase(get()) }
     single { GetTokenUseCase(get()) }
@@ -55,7 +53,7 @@ val useCaseModule = module {
 val viewModelModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { RegisterViewModel(get()) }
-    viewModel { StoryViewModel(get(), get()) }
+    viewModel { StoryViewModel(get()) }
     viewModel { DetailViewModel(get()) }
     viewModel { UploadViewModel(get()) }
 }
