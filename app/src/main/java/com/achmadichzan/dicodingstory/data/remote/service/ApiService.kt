@@ -77,6 +77,8 @@ class ApiService(
                 append("description", description)
                 append("photo", file.readBytes(), Headers.build {
                     append(HttpHeaders.ContentType, ContentType.Image.JPEG.contentType)
+                    append(HttpHeaders.ContentType, ContentType.Image.PNG.contentType)
+                    append(HttpHeaders.ContentType, ContentType.Image.Any.contentType)
                     append(
                         HttpHeaders.ContentDisposition,
                         "form-data; name=\"photo\"; filename=\"${file.name}\""

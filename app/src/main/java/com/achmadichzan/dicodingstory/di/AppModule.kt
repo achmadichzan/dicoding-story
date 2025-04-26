@@ -40,15 +40,48 @@ val storyModule = module {
 }
 
 val useCaseModule = module {
-    factory { LoginUseCase(get()) }
-    factory { RegisterUseCase(get()) }
-    single { GetDetailStoryUseCase(get()) }
-    single { SaveTokenUseCase(get()) }
-    single { GetTokenUseCase(get()) }
-    single { ClearTokenUseCase(get()) }
-    single { UploadStoryUseCase(get()) }
-    single { GetPagingStoryUseCase(get()) }
+    factory<LoginUseCase> {
+        LoginUseCase { email, password ->
+            get<AuthRepository>().login(email, password)
+        }
+    }
+    factory<RegisterUseCase> {
+        RegisterUseCase { name, email, password ->
+            get<AuthRepository>().register(name, email, password)
+        }
+    }
+    factory<ClearTokenUseCase> {
+        ClearTokenUseCase {
+            get<UserPreferencesImpl>().clearToken()
+        }
+    }
+    factory<GetDetailStoryUseCase> {
+        GetDetailStoryUseCase { id ->
+            get<StoryRepository>().getStoryDetail(id)
+        }
+    }
+    factory<GetTokenUseCase> {
+        GetTokenUseCase {
+            get<UserPreferencesImpl>().getToken()
+        }
+    }
+    factory<SaveTokenUseCase> {
+        SaveTokenUseCase { token ->
+            get<UserPreferencesImpl>().saveToken(token)
+        }
+    }
+    factory<UploadStoryUseCase> {
+        UploadStoryUseCase { file, description, lat, lon ->
+            get<StoryRepository>().uploadStory(file, description, lat, lon)
+        }
+    }
+    factory<GetPagingStoryUseCase> {
+        GetPagingStoryUseCase { token ->
+            get<StoryRepository>().getPagedStories(token)
+        }
+    }
 }
+
 
 val viewModelModule = module {
     viewModel { LoginViewModel(get(), get()) }

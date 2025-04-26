@@ -83,7 +83,7 @@ fun NavMain(
             val getTokenUseCase: GetTokenUseCase = getKoin().get()
 
             LaunchedEffect(Unit) {
-                tokenState = getTokenUseCase() ?: ""
+                tokenState = getTokenUseCase().toString()
             }
 
             StoryScreen(navController = navController, token = tokenState)
@@ -103,7 +103,7 @@ fun NavMain(
                 )
             }
         ) { backstackEntry ->
-            val id = backstackEntry.arguments?.getString("id") ?: ""
+            val id = backstackEntry.arguments?.getString("id").toString()
 
             DetailScreen(id = id, navController = navController)
         }
