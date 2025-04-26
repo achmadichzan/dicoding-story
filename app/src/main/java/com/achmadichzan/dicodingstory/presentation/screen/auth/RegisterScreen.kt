@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -59,16 +60,15 @@ import com.achmadichzan.dicodingstory.R
 import com.achmadichzan.dicodingstory.presentation.navigation.Route
 import com.achmadichzan.dicodingstory.presentation.screen.auth.components.EmailTextField
 import com.achmadichzan.dicodingstory.presentation.screen.auth.components.PasswordTextField
+import com.achmadichzan.dicodingstory.presentation.state.RegisterState
 import com.achmadichzan.dicodingstory.presentation.util.RegisterIntent
-import com.achmadichzan.dicodingstory.presentation.viewmodel.RegisterViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    viewModel: RegisterViewModel = koinViewModel()
+    state: RegisterState,
+    onIntent: (RegisterIntent) -> Unit,
 ) {
-    val state = viewModel.state
 
     val infiniteTransition = rememberInfiniteTransition(label = "slide")
 
@@ -175,14 +175,14 @@ fun RegisterScreen(
                         Icon(imageVector = image, contentDescription = description)
                     }
                 },
+                keyboardActions = KeyboardActions(onDone = { autoFill?.commit() }),
                 modifier = Modifier.semantics { contentType = ContentType.Password }
             )
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    viewModel.onIntent(RegisterIntent.Submit(name, email, password))
-                    autoFill?.commit()
+                    onIntent(RegisterIntent.Submit(name, email, password))
                 },
                 enabled = email.isNotEmpty() && password.isNotEmpty() && !state.isLoading
                         && passwordError == null && emailError == null,
@@ -207,8 +207,12 @@ fun RegisterScreen(
                 Text("Sudah punya akun? Masuk")
             }
 
-            state.error?.let {
-                Text(it, color = Color.Red)
+            state.error?.let { errorMessage ->
+                Text(
+                    errorMessage,
+                    color = Color.Red,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
         }
     }

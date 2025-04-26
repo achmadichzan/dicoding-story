@@ -86,7 +86,7 @@ val useCaseModule = module {
 val viewModelModule = module {
     viewModel { LoginViewModel(get(), get()) }
     viewModel { RegisterViewModel(get()) }
-    viewModel { StoryViewModel(get()) }
+    viewModel { StoryViewModel(get(), get()) }
     viewModel { DetailViewModel(get()) }
     viewModel { UploadViewModel(get()) }
 }

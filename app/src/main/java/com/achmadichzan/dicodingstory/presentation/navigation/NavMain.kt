@@ -12,6 +12,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.achmadichzan.dicodingstory.domain.usecase.GetTokenUseCase
 import com.achmadichzan.dicodingstory.presentation.screen.addstory.AddStoryScreen
 import com.achmadichzan.dicodingstory.presentation.screen.auth.LoginScreen
@@ -19,6 +20,11 @@ import com.achmadichzan.dicodingstory.presentation.screen.auth.RegisterScreen
 import com.achmadichzan.dicodingstory.presentation.screen.detail.DetailScreen
 import com.achmadichzan.dicodingstory.presentation.screen.story.StoryScreen
 import com.achmadichzan.dicodingstory.presentation.util.SessionManager
+import com.achmadichzan.dicodingstory.presentation.util.StoryIntent
+import com.achmadichzan.dicodingstory.presentation.viewmodel.LoginViewModel
+import com.achmadichzan.dicodingstory.presentation.viewmodel.RegisterViewModel
+import com.achmadichzan.dicodingstory.presentation.viewmodel.StoryViewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
 
 @Composable
@@ -47,7 +53,14 @@ fun NavMain(
                 )
             }
         ) {
-            LoginScreen(navController)
+            val viewModel = koinViewModel<LoginViewModel>()
+            val state = viewModel.state
+
+            LoginScreen(
+                navController = navController,
+                state = state,
+                onIntent = viewModel::onIntent
+            )
         }
         composable<Route.Register>(
             enterTransition = {
@@ -63,7 +76,14 @@ fun NavMain(
                 )
             }
         ) {
-            RegisterScreen(navController)
+            val viewModel = koinViewModel<RegisterViewModel>()
+            val state = viewModel.state
+
+            RegisterScreen(
+                navController = navController,
+                state = state,
+                onIntent = viewModel::onIntent
+            )
         }
         composable<Route.Story>(
             enterTransition = {
@@ -79,14 +99,49 @@ fun NavMain(
                 )
             }
         ) {
+            val viewModel = koinViewModel<StoryViewModel>()
             var tokenState by remember { mutableStateOf("") }
             val getTokenUseCase: GetTokenUseCase = getKoin().get()
 
             LaunchedEffect(Unit) {
                 tokenState = getTokenUseCase().toString()
+                viewModel.setToken(tokenState)
             }
 
-            StoryScreen(navController = navController, token = tokenState)
+            val pagingStories = viewModel.getPagedStories().collectAsLazyPagingItems()
+
+            LaunchedEffect(Unit) {
+                viewModel.navigationEvent.collect { event ->
+                    when (event) {
+                        is StoryIntent.Logout -> {
+                            navController.navigate(Route.Login) {
+                                popUpTo(0)
+                                launchSingleTop = true
+                                restoreState = false
+                            }
+                        }
+                        is StoryIntent.AddStory -> {
+                            navController.navigate(Route.AddStory) {
+                                popUpTo(Route.Story) { inclusive = false }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                        is StoryIntent.OpenDetail -> {
+                            navController.navigate(Route.StoryDetail(event.storyId)) {
+                                popUpTo(Route.Story) { inclusive = false }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    }
+                }
+            }
+
+            StoryScreen(
+                pagingStories = pagingStories,
+                onIntent = viewModel::onIntent
+            )
         }
 
         composable<Route.StoryDetail>(

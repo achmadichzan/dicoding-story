@@ -5,10 +5,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.usecase.RegisterUseCase
 import com.achmadichzan.dicodingstory.presentation.util.RegisterIntent
 import com.achmadichzan.dicodingstory.presentation.state.RegisterState
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class RegisterViewModel(
     private val registerUseCase: RegisterUseCase
@@ -28,9 +32,25 @@ class RegisterViewModel(
             state = state.copy(isLoading = true)
             try {
                 val result = registerUseCase(name, email, password)
-                state = state.copy(isLoading = false, success = result)
+                if (result.error) {
+                    state = state.copy(isLoading = false, error = result.message)
+                } else {
+                    state = state.copy(isLoading = false, success = result)
+                }
+            } catch (e: ClientRequestException) {
+                val errorBody = e.response.bodyAsText()
+                val errorMessage = try {
+                    Json.decodeFromString(BaseResponse.serializer(), errorBody).message
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    "Terjadi kesalahan saat memproses registrasi."
+                }
+                state = state.copy(isLoading = false, error = errorMessage)
             } catch (e: Exception) {
-                state = state.copy(isLoading = false, error = e.message)
+                state = state.copy(
+                    isLoading = false,
+                    error = e.message ?: "Terjadi kesalahan tak terduga"
+                )
             }
         }
     }

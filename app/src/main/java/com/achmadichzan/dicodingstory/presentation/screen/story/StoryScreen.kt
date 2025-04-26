@@ -33,34 +33,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import com.achmadichzan.dicodingstory.R
-import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
-import com.achmadichzan.dicodingstory.presentation.navigation.Route
+import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.presentation.screen.story.components.StoryItem
-import com.achmadichzan.dicodingstory.presentation.util.SessionManager
-import com.achmadichzan.dicodingstory.presentation.viewmodel.StoryViewModel
+import com.achmadichzan.dicodingstory.presentation.util.StoryIntent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.getKoin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoryScreen(
-    navController: NavHostController,
-    viewModel: StoryViewModel = koinViewModel(),
-    token: String,
+    pagingStories: LazyPagingItems<StoryDto>,
+    onIntent: (StoryIntent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
     var isLoggingOut by remember { mutableStateOf(false) }
-
-    val clearTokenUseCase: ClearTokenUseCase = getKoin().get()
-    val pagingStories = viewModel.getPagedStories(token).collectAsLazyPagingItems()
-
     var isPullRefreshing by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullToRefreshState()
 
@@ -80,13 +70,7 @@ fun StoryScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    navController.navigate(Route.AddStory) {
-                        popUpTo(Route.Story) { inclusive = false }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                onClick = { onIntent(StoryIntent.AddStory) }
             ) {
                 Icon(
                     painter = painterResource(R.drawable.add_24),
@@ -103,15 +87,7 @@ fun StoryScreen(
             if (isLoggingOut) {
                 LogoutDialog(
                     onConfirm = {
-                        scope.launch {
-                            clearTokenUseCase()
-                            SessionManager.token = null
-                            navController.navigate(Route.Login) {
-                                popUpTo(0)
-                                launchSingleTop = true
-                                restoreState = false
-                            }
-                        }
+                        onIntent(StoryIntent.Logout)
                     },
                     onDismiss = { isLoggingOut = false }
                 )
@@ -121,7 +97,6 @@ fun StoryScreen(
                 is LoadState.Loading -> {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
                 }
-
                 else -> {
                     PullToRefreshBox(
                         isRefreshing = isPullRefreshing,
@@ -164,11 +139,7 @@ fun StoryScreen(
                                         ),
                                         story = story,
                                         onClick = {
-                                            navController.navigate(Route.StoryDetail(story.id)) {
-                                                popUpTo(Route.Story) { inclusive = false }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
+                                            onIntent(StoryIntent.OpenDetail(story.id))
                                         }
                                     )
                                 }

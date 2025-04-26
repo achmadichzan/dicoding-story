@@ -57,16 +57,15 @@ import com.achmadichzan.dicodingstory.R
 import com.achmadichzan.dicodingstory.presentation.navigation.Route
 import com.achmadichzan.dicodingstory.presentation.screen.auth.components.EmailTextField
 import com.achmadichzan.dicodingstory.presentation.screen.auth.components.PasswordTextField
+import com.achmadichzan.dicodingstory.presentation.state.LoginState
 import com.achmadichzan.dicodingstory.presentation.util.LoginIntent
-import com.achmadichzan.dicodingstory.presentation.viewmodel.LoginViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: LoginViewModel = koinViewModel()
+    state: LoginState,
+    onIntent: (LoginIntent) -> Unit,
 ) {
-    val state = viewModel.state
 
     val infiniteTransition = rememberInfiniteTransition(label = "slide")
 
@@ -166,9 +165,7 @@ fun LoginScreen(
                         Icon(imageVector = image, contentDescription = description)
                     }
                 },
-                keyboardActions = KeyboardActions(
-                    onGo = { viewModel.onIntent(LoginIntent.Submit(email, password)) }
-                ),
+                keyboardActions = KeyboardActions(onDone = { autoFill?.commit() }),
                 modifier = Modifier.semantics { contentType = ContentType.Password }
             )
 
@@ -176,8 +173,7 @@ fun LoginScreen(
                 modifier = Modifier.fillMaxWidth()
                     .padding(top = 8.dp),
                 onClick = {
-                    viewModel.onIntent(LoginIntent.Submit(email, password))
-                    autoFill?.commit()
+                    onIntent(LoginIntent.Submit(email, password))
                 },
                 enabled = email.isNotEmpty() && password.isNotEmpty() && !state.isLoading
                         && passwordError == null && emailError == null,
@@ -205,9 +201,9 @@ fun LoginScreen(
                 Text("Belum punya akun? Daftar")
             }
 
-            state.error?.let {
+            state.error?.let { errorMessage ->
                 Text(
-                    it,
+                    errorMessage,
                     color = Color.Red,
                     style = MaterialTheme.typography.bodySmall
                 )
