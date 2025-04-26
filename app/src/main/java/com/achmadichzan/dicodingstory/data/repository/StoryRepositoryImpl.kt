@@ -5,11 +5,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
-import com.achmadichzan.dicodingstory.data.local.room.StoryDao
 import com.achmadichzan.dicodingstory.data.local.room.StoryDatabase
 import com.achmadichzan.dicodingstory.data.local.room.StoryEntity
 import com.achmadichzan.dicodingstory.data.remote.paging.StoryRemoteMediator
-import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.DetailResponse
@@ -40,7 +38,12 @@ class StoryRepositoryImpl(
     override fun getPagedStories(token: String): Flow<PagingData<StoryEntity>> {
         @OptIn(ExperimentalPagingApi::class)
         return Pager(
-            config = PagingConfig(pageSize = 10),
+            config = PagingConfig(
+                pageSize = 10,
+                prefetchDistance = 1,
+                initialLoadSize = 10,
+                enablePlaceholders = false
+            ),
             remoteMediator = StoryRemoteMediator(
                 database = database,
                 apiService = apiService

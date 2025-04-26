@@ -4,7 +4,6 @@ import androidx.paging.PagingData
 import com.achmadichzan.dicodingstory.data.local.room.StoryEntity
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.DetailResponse
-import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 

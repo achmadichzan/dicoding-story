@@ -1,11 +1,10 @@
 package com.achmadichzan.dicodingstory.data.repository
 
+import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.LoginRequest
-import com.achmadichzan.dicodingstory.domain.model.LoginResult
-import com.achmadichzan.dicodingstory.domain.model.RegisterRequest
-import com.achmadichzan.dicodingstory.data.remote.service.ApiService
 import com.achmadichzan.dicodingstory.domain.model.LoginResponse
+import com.achmadichzan.dicodingstory.domain.model.RegisterRequest
 import com.achmadichzan.dicodingstory.domain.repository.AuthRepository
 
 class AuthRepositoryImpl(

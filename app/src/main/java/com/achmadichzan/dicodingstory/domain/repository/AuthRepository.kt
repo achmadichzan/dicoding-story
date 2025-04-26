@@ -2,7 +2,6 @@ package com.achmadichzan.dicodingstory.domain.repository
 
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.LoginResponse
-import com.achmadichzan.dicodingstory.domain.model.LoginResult
 
 interface AuthRepository {
 
