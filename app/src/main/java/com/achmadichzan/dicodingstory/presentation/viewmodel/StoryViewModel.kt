@@ -35,14 +35,12 @@ class StoryViewModel(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getPagedStories(): Flow<PagingData<StoryDto>> {
-        return _token.flatMapLatest { token ->
+    val pagedStories: Flow<PagingData<StoryDto>> = _token
+        .flatMapLatest { token ->
             getPagingStoryUseCase(token)
-                .map { pagingData ->
-                    pagingData.map { it.toDto() }
-                }
-        }.cachedIn(viewModelScope)
-    }
+                .map { pagingData -> pagingData.map { it.toDto() } }
+        }
+        .cachedIn(viewModelScope)
 
     fun onIntent(intent: StoryIntent) {
         when (intent) {

@@ -44,7 +44,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.navigation.NavController
-import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.AsyncImage
 import com.achmadichzan.dicodingstory.R
 import com.achmadichzan.dicodingstory.presentation.components.CameraXScreen
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
@@ -149,7 +149,7 @@ fun AddStoryScreen(
                     .verticalScroll(rememberScrollState())
             ) {
                 imageUri?.let {
-                    SubcomposeAsyncImage(
+                    AsyncImage(
                         model = it,
                         contentDescription = "Selected Image",
                         modifier = Modifier.fillMaxWidth()

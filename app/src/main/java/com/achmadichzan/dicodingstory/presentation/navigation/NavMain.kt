@@ -108,15 +108,20 @@ fun NavMain(
                 viewModel.setToken(tokenState)
             }
 
-            val pagingStories = viewModel.getPagedStories().collectAsLazyPagingItems()
+            val pagingStories = remember(viewModel) {
+                viewModel.pagedStories
+            }.collectAsLazyPagingItems()
 
             LaunchedEffect(Unit) {
                 viewModel.navigationEvent.collect { event ->
                     when (event) {
                         is StoryIntent.Logout -> {
                             navController.navigate(Route.Login) {
-                                popUpTo(0)
-                                launchSingleTop = true
+                                popUpTo(0) {
+                                    inclusive = true
+                                    saveState = false
+                                }
+                                launchSingleTop = false
                                 restoreState = false
                             }
                         }
@@ -129,7 +134,10 @@ fun NavMain(
                         }
                         is StoryIntent.OpenDetail -> {
                             navController.navigate(Route.StoryDetail(event.storyId)) {
-                                popUpTo(Route.Story) { inclusive = false }
+                                popUpTo(Route.Story) {
+                                    inclusive = false
+                                    saveState = true
+                                }
                                 launchSingleTop = true
                                 restoreState = true
                             }
