@@ -1,6 +1,9 @@
 package com.achmadichzan.dicodingstory.presentation.screen.detail
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,16 +22,24 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.achmadichzan.dicodingstory.presentation.components.ShimmerEffect
+import com.achmadichzan.dicodingstory.presentation.screen.detail.component.detectTransformGesturesWithEnd
 import com.achmadichzan.dicodingstory.presentation.viewmodel.DetailViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
@@ -36,6 +47,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +68,9 @@ fun DetailScreen(
             TopAppBar(
                 title = { Text("Story Detail") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = dropUnlessResumed {
+                        navController.popBackStack()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                             contentDescription = "Back"
@@ -84,23 +98,77 @@ fun DetailScreen(
                         modifier = Modifier.fillMaxSize()
                             .padding(horizontal = 16.dp)
                             .verticalScroll(rememberScrollState())
+                            .zIndex(0f)
                     ) {
+                        val scale = remember { Animatable(1f) }
+                        val rotation = remember { Animatable(0f) }
+                        val offset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
+                        val coroutineScope = rememberCoroutineScope()
+
                         val screenHeight = LocalConfiguration.current.screenHeightDp.dp
 
-                        SubcomposeAsyncImage(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            model = state.story.photoUrl,
-                            contentDescription = state.story.name,
-                            loading = {
-                                ShimmerEffect(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(screenHeight * 0.4f)
-                                )
-                            },
-                            contentScale = ContentScale.FillWidth
-                        )
+                        BoxWithConstraints(
+                            modifier = Modifier.fillMaxWidth()
+                                .zIndex(1f),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                            val maxWidth = this.constraints.maxWidth
+                            val maxHeight = this.constraints.maxHeight
+
+                            SubcomposeAsyncImage(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .pointerInput(Unit) {
+                                        detectTransformGesturesWithEnd(
+                                            onGesture = { _, pan, zoom, rotationChange ->
+                                                coroutineScope.launch {
+                                                    val newScale = (scale.value * zoom).coerceIn(1f, 5f)
+                                                    scale.snapTo(newScale)
+
+                                                    rotation.snapTo(rotation.value + rotationChange)
+
+                                                    val extraWidth = (scale.value - 1) * maxWidth
+                                                    val extraHeight = (scale.value - 1) * maxHeight
+
+                                                    val maxX = extraWidth / 2
+                                                    val maxY = extraHeight / 2
+
+                                                    val newOffset = Offset(
+                                                        (offset.value.x + scale.value * pan.x).coerceIn(-maxX, maxX),
+                                                        (offset.value.y + scale.value * pan.y).coerceIn(-maxY, maxY)
+                                                    )
+                                                    offset.snapTo(newOffset)
+                                                }
+                                            },
+                                            onGestureEnd = {
+                                                coroutineScope.launch {
+                                                    scale.animateTo(1f)
+                                                    rotation.animateTo(0f)
+                                                    offset.animateTo(Offset.Zero)
+                                                }
+                                            }
+                                        )
+                                    }
+                                    .graphicsLayer {
+                                        scaleX = scale.value
+                                        scaleY = scale.value
+                                        rotationZ = rotation.value
+                                        translationX = offset.value.x
+                                        translationY = offset.value.y
+                                    },
+                                model = state.story.photoUrl,
+                                contentDescription = state.story.name,
+                                loading = {
+                                    ShimmerEffect(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(screenHeight * 0.4f)
+                                    )
+                                },
+                                contentScale = ContentScale.FillWidth
+                            )
+                        }
 
                         Text("Name: ${state.story.name}", fontWeight = FontWeight.Bold)
 
@@ -119,27 +187,26 @@ fun DetailScreen(
 
                         val cameraPositionState = rememberCameraPositionState()
 
-                        LaunchedEffect(storyLatLng) {
-                            cameraPositionState.animate(
-                                CameraUpdateFactory.newLatLngZoom(storyLatLng, 8f)
-                            )
-                        }
-
-                        state.story.lat?.let {
-                            state.story.lon?.let {
-                                GoogleMap(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(screenHeight * 0.4f),
-                                    cameraPositionState = cameraPositionState
-                                ) {
-                                    Marker(
-                                        state = MarkerState(position = storyLatLng),
-                                        title = state.story.name,
-                                        snippet = state.story.description
-                                    )
-                                }
+                        GoogleMap(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(screenHeight * 0.4f),
+                            cameraPositionState = cameraPositionState,
+                            onMapLoaded = {
+                                val storyLatLng = LatLng(
+                                    state.story.lat ?: indonesiaLatLng.latitude,
+                                    state.story.lon ?: indonesiaLatLng.longitude
+                                )
+                                cameraPositionState.move(
+                                    CameraUpdateFactory.newLatLngZoom(storyLatLng, 8f)
+                                )
                             }
+                        ) {
+                            Marker(
+                                state = MarkerState(position = storyLatLng),
+                                title = state.story.name,
+                                snippet = state.story.description
+                            )
                         }
                     }
                 }

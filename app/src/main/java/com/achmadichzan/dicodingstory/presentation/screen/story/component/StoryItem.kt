@@ -1,4 +1,4 @@
-package com.achmadichzan.dicodingstory.presentation.screen.story.components
+package com.achmadichzan.dicodingstory.presentation.screen.story.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

@@ -2,8 +2,6 @@ package com.achmadichzan.dicodingstory.presentation.screen.story
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,10 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.NotListedLocation
-import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.automirrored.outlined.Logout
-import androidx.compose.material.icons.automirrored.outlined.NotListedLocation
 import androidx.compose.material.icons.twotone.Add
 import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.AlertDialog
@@ -41,14 +36,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
-import com.achmadichzan.dicodingstory.R
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
-import com.achmadichzan.dicodingstory.presentation.screen.story.components.StoryItem
+import com.achmadichzan.dicodingstory.presentation.screen.story.component.StoryItem
 import com.achmadichzan.dicodingstory.presentation.util.StoryIntent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -80,13 +74,17 @@ fun StoryScreen(
             TopAppBar(
                 title = { Text("All Stories") },
                 actions = {
-                    IconButton(onClick = { onIntent(StoryIntent.MapsLocation) }) {
+                    IconButton(onClick = dropUnlessResumed {
+                        onIntent(StoryIntent.MapsLocation) }
+                    ) {
                         Icon(
                             imageVector = Icons.TwoTone.LocationOn,
                             contentDescription = "Logout"
                         )
                     }
-                    IconButton(onClick = { isLoggingOut = true }) {
+                    IconButton(onClick = dropUnlessResumed {
+                        isLoggingOut = true }
+                    ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.Logout,
                             contentDescription = "Logout"
@@ -113,10 +111,12 @@ fun StoryScreen(
         ) {
             if (isLoggingOut) {
                 LogoutDialog(
-                    onConfirm = {
+                    onConfirm = dropUnlessResumed {
                         onIntent(StoryIntent.Logout)
                     },
-                    onDismiss = { isLoggingOut = false }
+                    onDismiss = dropUnlessResumed {
+                        isLoggingOut = false
+                    }
                 )
             }
 
@@ -130,8 +130,8 @@ fun StoryScreen(
                         onRefresh = {
                             isPullRefreshing = true
                             scope.launch {
-                                pagingStories.refresh()
                                 delay(300)
+                                pagingStories.refresh()
                                 isPullRefreshing = false
                             }
                         },
@@ -163,7 +163,7 @@ fun StoryScreen(
                                             this.scaleY = animatable.value
                                         },
                                         story = story,
-                                        onClick = {
+                                        onClick = dropUnlessResumed {
                                             onIntent(StoryIntent.OpenDetail(story.id))
                                         }
                                     )
