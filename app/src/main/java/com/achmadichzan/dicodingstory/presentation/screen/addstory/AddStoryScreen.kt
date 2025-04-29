@@ -14,12 +14,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.twotone.AddPhotoAlternate
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -145,6 +150,7 @@ fun AddStoryScreen(
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
+                    .imePadding()
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
@@ -155,10 +161,11 @@ fun AddStoryScreen(
                         modifier = Modifier.fillMaxWidth()
                             .height(200.dp)
                     )
-                } ?: Image(
-                    painter = painterResource(R.drawable.add_photo_50),
+                } ?: Icon(
+                    imageVector = Icons.TwoTone.AddPhotoAlternate,
                     contentDescription = "Upload Image",
                     modifier = Modifier.fillMaxWidth()
+                        .size(200.dp)
                 )
 
                 Row(
@@ -174,7 +181,16 @@ fun AddStoryScreen(
                     }) {
                         Text("Gallery")
                     }
-                    OutlinedButton(onClick = { launchCamera() }) {
+                    OutlinedButton(onClick = {
+                        when (PackageManager.PERMISSION_GRANTED) {
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                                launchCamera()
+                            }
+                            else -> {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                    }) {
                         Text("Camera")
                     }
 
@@ -190,8 +206,6 @@ fun AddStoryScreen(
                     }) {
                         Text("CameraX")
                     }
-
-
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -200,7 +214,9 @@ fun AddStoryScreen(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .wrapContentHeight()
+                        .height(100.dp),
                     shape = RoundedCornerShape(10.dp)
                 )
 

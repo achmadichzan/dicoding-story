@@ -13,6 +13,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.NotListedLocation
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.automirrored.outlined.NotListedLocation
+import androidx.compose.material.icons.twotone.Add
+import androidx.compose.material.icons.twotone.LocationOn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -78,13 +82,13 @@ fun StoryScreen(
                 actions = {
                     IconButton(onClick = { onIntent(StoryIntent.MapsLocation) }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.NotListedLocation,
+                            imageVector = Icons.TwoTone.LocationOn,
                             contentDescription = "Logout"
                         )
                     }
                     IconButton(onClick = { isLoggingOut = true }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ExitToApp,
+                            imageVector = Icons.AutoMirrored.Outlined.Logout,
                             contentDescription = "Logout"
                         )
                     }
@@ -96,7 +100,7 @@ fun StoryScreen(
                 onClick = { onIntent(StoryIntent.AddStory) }
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.add_24),
+                    imageVector = Icons.TwoTone.Add,
                     contentDescription = "Add Story"
                 )
             }

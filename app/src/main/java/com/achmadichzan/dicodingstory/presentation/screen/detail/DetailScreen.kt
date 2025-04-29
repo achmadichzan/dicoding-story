@@ -30,6 +30,12 @@ import androidx.navigation.NavController
 import coil3.compose.SubcomposeAsyncImage
 import com.achmadichzan.dicodingstory.presentation.components.ShimmerEffect
 import com.achmadichzan.dicodingstory.presentation.viewmodel.DetailViewModel
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +57,10 @@ fun DetailScreen(
                 title = { Text("Story Detail") },
                 navigationIcon = {
                     IconButton(onClick = { navController.navigateUp() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Back")
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                            contentDescription = "Back"
+                        )
                     }
                 }
             )
@@ -64,7 +73,11 @@ fun DetailScreen(
             when {
                 state.isLoading -> CircularProgressIndicator(Modifier.align(Alignment.Center))
 
-                state.error != null -> Text("Error: ${state.error}", color = Color.Red)
+                state.error != null -> Text(
+                    text = "Error: ${state.error}",
+                    color = Color.Red,
+                    modifier = Modifier.align(Alignment.Center)
+                )
 
                 state.story != null -> {
                     Column(
@@ -83,7 +96,7 @@ fun DetailScreen(
                                 ShimmerEffect(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(screenHeight)
+                                        .height(screenHeight * 0.4f)
                                 )
                             },
                             contentScale = ContentScale.FillWidth
@@ -93,11 +106,41 @@ fun DetailScreen(
 
                         Text("Description: ${state.story.description}")
 
-                        Text("Created At: ${state.story.createdAt}")
-
                         state.story.lat?.let { Text("Lat: $it") }
 
                         state.story.lon?.let { Text("Lon: $it") }
+
+                        val indonesiaLatLng = LatLng(-2.5489, 118.0149)
+
+                        val storyLatLng = LatLng(
+                            state.story.lat ?: indonesiaLatLng.latitude,
+                            state.story.lon ?: indonesiaLatLng.longitude
+                        )
+
+                        val cameraPositionState = rememberCameraPositionState()
+
+                        LaunchedEffect(storyLatLng) {
+                            cameraPositionState.animate(
+                                CameraUpdateFactory.newLatLngZoom(storyLatLng, 8f)
+                            )
+                        }
+
+                        state.story.lat?.let {
+                            state.story.lon?.let {
+                                GoogleMap(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(screenHeight * 0.4f),
+                                    cameraPositionState = cameraPositionState
+                                ) {
+                                    Marker(
+                                        state = MarkerState(position = storyLatLng),
+                                        title = state.story.name,
+                                        snippet = state.story.description
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
