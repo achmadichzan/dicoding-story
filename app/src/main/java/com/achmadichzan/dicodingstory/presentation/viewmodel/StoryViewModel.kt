@@ -61,6 +61,11 @@ class StoryViewModel(
                     _navigationEvent.emit(StoryIntent.AddStory)
                 }
             }
+            is StoryIntent.MapsLocation -> {
+                viewModelScope.launch {
+                    _navigationEvent.emit(StoryIntent.MapsLocation)
+                }
+            }
         }
     }
 }

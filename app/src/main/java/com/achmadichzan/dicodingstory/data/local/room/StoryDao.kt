@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StoryDao {
@@ -15,4 +16,7 @@ interface StoryDao {
 
     @Query("DELETE FROM stories")
     suspend fun clearAll()
+
+    @Query("SELECT * FROM stories WHERE lat IS NOT NULL AND lon IS NOT NULL")
+    fun observeStoriesWithLocation(): Flow<List<StoryEntity>>
 }

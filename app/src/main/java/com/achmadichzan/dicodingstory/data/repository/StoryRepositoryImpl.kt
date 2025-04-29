@@ -53,4 +53,8 @@ class StoryRepositoryImpl(
             }
         ).flow
     }
+
+    override fun observeStoriesWithLocation(): Flow<List<StoryEntity>> {
+        return database.storyDao().observeStoriesWithLocation()
+    }
 }

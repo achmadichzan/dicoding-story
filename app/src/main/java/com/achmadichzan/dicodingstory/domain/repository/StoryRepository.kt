@@ -19,4 +19,6 @@ interface StoryRepository {
     ): BaseResponse
 
     fun getPagedStories(token: String): Flow<PagingData<StoryEntity>>
+
+    fun observeStoriesWithLocation(): Flow<List<StoryEntity>>
 }

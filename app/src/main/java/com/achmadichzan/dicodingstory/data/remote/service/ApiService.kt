@@ -45,7 +45,7 @@ class ApiService(
         token: String? = null,
         page: Int? = null,
         size: Int? = null,
-        location: Int? = 1
+        location: Int? = null
     ): StoryResponse {
         val userToken = preferences.getToken() ?: token
         return client.get("v1/stories") {

@@ -11,7 +11,9 @@ composeBom = "2025.04.01"
 kspVersion = "2.1.0-1.0.29"
 koin = "4.0.4"
 ktor = "3.1.2"
+mapsCompose = "4.4.1"
 materialIconsExtended = "1.7.8"
+secretsGradlePlugin = "2.0.1"
 slf4jSimple = "2.0.17"
 navigationCompose = "2.8.9"
 coreSplashscreen = "1.2.0-beta02"
@@ -20,6 +22,8 @@ room = "2.7.1"
 pagingRuntime = "3.3.6"
 datastorePreferences = "1.1.4"
 cameraxVersion = "1.4.2"
+mapsKtx = "5.0.0"
+playServicesMaps = "19.2.0"
 
 [libraries]
 
@@ -77,6 +81,16 @@ androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "cameraxVersion" }
 camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "cameraxVersion" }
 camera-view = { module = "androidx.camera:camera-view", version.ref = "cameraxVersion" }
+
+secrets-gradle-plugin = { module = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+
+# Maps
+maps-ktx           = { module = "com.google.maps.android:maps-ktx", version.ref = "mapsKtx" }
+maps-utils-ktx     = { module = "com.google.maps.android:maps-utils-ktx", version.ref = "mapsKtx" }
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+maps-compose         = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+maps-compose-utils   = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsCompose" }
+maps-compose-widgets = { module = "com.google.maps.android:maps-compose-widgets", version.ref = "mapsCompose" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -147,4 +161,12 @@ camera = [
     "androidx-camera-camera2",
     "camera-lifecycle",
     "camera-view"
+]
+maps = [
+    "maps-ktx",
+    "maps-utils-ktx",
+    "play-services-maps",
+    "maps-compose",
+    "maps-compose-utils",
+    "maps-compose-widgets"
 ]

@@ -18,6 +18,7 @@ import com.achmadichzan.dicodingstory.presentation.screen.addstory.AddStoryScree
 import com.achmadichzan.dicodingstory.presentation.screen.auth.LoginScreen
 import com.achmadichzan.dicodingstory.presentation.screen.auth.RegisterScreen
 import com.achmadichzan.dicodingstory.presentation.screen.detail.DetailScreen
+import com.achmadichzan.dicodingstory.presentation.screen.maps.MapsLocationScreen
 import com.achmadichzan.dicodingstory.presentation.screen.story.StoryScreen
 import com.achmadichzan.dicodingstory.presentation.util.SessionManager
 import com.achmadichzan.dicodingstory.presentation.util.StoryIntent
@@ -142,6 +143,16 @@ fun NavMain(
                                 restoreState = true
                             }
                         }
+                        is StoryIntent.MapsLocation -> {
+                            navController.navigate(Route.MapsLocation) {
+                                popUpTo(Route.Story) {
+                                    inclusive = false
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
                     }
                 }
             }
@@ -173,6 +184,10 @@ fun NavMain(
 
         composable<Route.AddStory> {
             AddStoryScreen(navController = navController)
+        }
+
+        composable<Route.MapsLocation> {
+            MapsLocationScreen()
         }
     }
 }

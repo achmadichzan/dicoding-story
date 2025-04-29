@@ -19,4 +19,7 @@ object Route {
 
     @Serializable
     object AddStory
+
+    @Serializable
+    object MapsLocation
 }
