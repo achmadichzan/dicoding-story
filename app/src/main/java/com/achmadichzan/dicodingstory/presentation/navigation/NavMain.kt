@@ -21,7 +21,6 @@ import com.achmadichzan.dicodingstory.presentation.intent.DetailIntent
 import com.achmadichzan.dicodingstory.presentation.intent.LoginIntent
 import com.achmadichzan.dicodingstory.presentation.intent.MapsLocationIntent
 import com.achmadichzan.dicodingstory.presentation.intent.RegisterIntent
-import com.achmadichzan.dicodingstory.presentation.util.SessionManager
 import com.achmadichzan.dicodingstory.presentation.intent.StoryIntent
 import com.achmadichzan.dicodingstory.presentation.ui.screen.addstory.AddStoryScreen
 import com.achmadichzan.dicodingstory.presentation.ui.screen.auth.LoginScreen
@@ -39,14 +38,10 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
 
 @Composable
-fun NavMain(navController: NavHostController = rememberNavController()) {
+fun NavMain(token: String?) {
 
-    val cachedToken = SessionManager.token
-
-    val startDestination = when {
-        cachedToken.isNullOrBlank() -> Route.Login
-        else -> Route.Story
-    }
+    val navController: NavHostController = rememberNavController()
+    val startDestination = if (token.isNullOrBlank()) Route.Login else Route.Story
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable<Route.Login>(

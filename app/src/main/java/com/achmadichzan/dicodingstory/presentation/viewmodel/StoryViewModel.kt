@@ -9,7 +9,6 @@ import com.achmadichzan.dicodingstory.data.local.mapper.toDto
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.GetPagingStoryUseCase
-import com.achmadichzan.dicodingstory.presentation.util.SessionManager
 import com.achmadichzan.dicodingstory.presentation.intent.StoryIntent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -47,7 +46,6 @@ class StoryViewModel(
             is StoryIntent.Logout -> {
                 viewModelScope.launch {
                     clearTokenUseCase()
-                    SessionManager.token = null
                     _navigationEvent.emit(StoryIntent.Logout)
                 }
             }

@@ -9,7 +9,6 @@ import androidx.compose.animation.slideOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -90,7 +89,8 @@ fun StoryScreen(
                 title = { Text("All Stories") },
                 actions = {
                     IconButton(onClick = dropUnlessResumed {
-                        onIntent(StoryIntent.MapsLocation) }
+                        onIntent(StoryIntent.MapsLocation)
+                    }
                     ) {
                         Icon(
                             imageVector = Icons.TwoTone.LocationOn,
