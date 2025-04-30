@@ -5,12 +5,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOut
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -55,8 +51,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
-import com.achmadichzan.dicodingstory.presentation.ui.screen.story.component.StoryItem
 import com.achmadichzan.dicodingstory.presentation.intent.StoryIntent
+import com.achmadichzan.dicodingstory.presentation.ui.screen.story.component.StoryItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
