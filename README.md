@@ -62,13 +62,7 @@ This project is for learning purposes and is not currently licensed under any op
 
 # 📱 Demo App
 ---
-<table>
-  <tr>
-    <th>First Submission</th>
-    <th>Second Submission</th>
-  </tr>
-  <tr>
-    <td><img src="https://github.com/user-attachments/assets/3a670555-9694-4136-8b3d-c709dee158f9" width="320"/></td>
-    <td><img src="https://github.com/user-attachments/assets/10049913-904d-46de-a482-df10fbf0c13c" width="320"/></td>
-  </tr>
-</table>
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/3a670555-9694-4136-8b3d-c709dee158f9" width="45%" autoplay loop muted></video>
+  <video src="https://github.com/user-attachments/assets/10049913-904d-46de-a482-df10fbf0c13c" width="45%" autoplay loop muted></video>
+</p>
