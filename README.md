@@ -63,6 +63,6 @@ This project is for learning purposes and is not currently licensed under any op
 # 📱 Demo App
 ---
 <p align="center">
-  <video src="https://github.com/user-attachments/assets/3a670555-9694-4136-8b3d-c709dee158f9" width="45%" autoplay loop muted></video>
-  <video src="https://github.com/user-attachments/assets/10049913-904d-46de-a482-df10fbf0c13c" width="45%" autoplay loop muted></video>
+  <video src="https://github.com/user-attachments/assets/12cadb64-88f7-4572-a210-e7f4f7bff7d7" width="45%" autoplay loop muted></video>
+  <video src="https://github.com/user-attachments/assets/468f1344-1fee-4677-9a15-b3cb6ec2c463" width="45%" autoplay loop muted></video>
 </p>
