@@ -3,7 +3,7 @@
     <style name="Theme.DicodingStory.DicodingSplash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">?attr/colorSurface</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/avd_dicoding</item>
-        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="windowSplashScreenAnimationDuration">@integer/material_motion_duration_long_2</item>
         <item name="postSplashScreenTheme">@style/Theme.DicodingStory</item>
     </style>
 </resources>

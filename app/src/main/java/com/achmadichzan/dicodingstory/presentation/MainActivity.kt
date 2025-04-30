@@ -18,19 +18,14 @@ class MainActivity : ComponentActivity() {
     private var token: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
         userPreferences = UserPreferencesImpl(applicationContext)
 
-        var isTokenLoaded = false
-
-        splashScreen.setKeepOnScreenCondition { !isTokenLoaded }
-
         lifecycleScope.launch {
             token = userPreferences.getToken()
-            isTokenLoaded = true
 
             setContent {
                 DicodingStoryTheme {

@@ -71,7 +71,7 @@ fun NavMain(token: String?) {
                         }
                         LoginIntent.NavigateToRegister -> {
                             navController.navigate(Route.Register) {
-                                popUpTo(Route.Register) {
+                                popUpTo(Route.Login) {
                                     inclusive = false
                                     saveState = true
                                 }
@@ -244,7 +244,7 @@ fun NavMain(token: String?) {
             LaunchedEffect(Unit) {
                 viewModel.navigationEvent.collect { intent ->
                     when (intent) {
-                        AddStoryIntent.GoBack -> navController.popBackStack()
+                        AddStoryIntent.GoBack -> navController.navigateBack()
                     }
                 }
             }
@@ -266,7 +266,7 @@ fun NavMain(token: String?) {
                 viewModel.navigationEvent.collect { event ->
                     when (event) {
                         MapsLocationIntent.GoBack -> {
-                            navController.popBackStack()
+                            navController.navigateBack()
                         }
                     }
                 }
