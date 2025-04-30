@@ -4,34 +4,43 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.achmadichzan.dicodingstory.domain.usecase.GetTokenUseCase
-import com.achmadichzan.dicodingstory.presentation.screen.addstory.AddStoryScreen
-import com.achmadichzan.dicodingstory.presentation.screen.auth.LoginScreen
-import com.achmadichzan.dicodingstory.presentation.screen.auth.RegisterScreen
-import com.achmadichzan.dicodingstory.presentation.screen.detail.DetailScreen
-import com.achmadichzan.dicodingstory.presentation.screen.maps.MapsLocationScreen
-import com.achmadichzan.dicodingstory.presentation.screen.story.StoryScreen
+import com.achmadichzan.dicodingstory.presentation.intent.AddStoryIntent
+import com.achmadichzan.dicodingstory.presentation.intent.DetailIntent
+import com.achmadichzan.dicodingstory.presentation.intent.LoginIntent
+import com.achmadichzan.dicodingstory.presentation.intent.MapsLocationIntent
+import com.achmadichzan.dicodingstory.presentation.intent.RegisterIntent
 import com.achmadichzan.dicodingstory.presentation.util.SessionManager
-import com.achmadichzan.dicodingstory.presentation.util.StoryIntent
+import com.achmadichzan.dicodingstory.presentation.intent.StoryIntent
+import com.achmadichzan.dicodingstory.presentation.ui.screen.addstory.AddStoryScreen
+import com.achmadichzan.dicodingstory.presentation.ui.screen.auth.LoginScreen
+import com.achmadichzan.dicodingstory.presentation.ui.screen.auth.RegisterScreen
+import com.achmadichzan.dicodingstory.presentation.ui.screen.detail.DetailScreen
+import com.achmadichzan.dicodingstory.presentation.ui.screen.maps.MapsLocationScreen
+import com.achmadichzan.dicodingstory.presentation.ui.screen.story.StoryScreen
+import com.achmadichzan.dicodingstory.presentation.viewmodel.DetailViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.LoginViewModel
+import com.achmadichzan.dicodingstory.presentation.viewmodel.MapsLocationViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.RegisterViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.StoryViewModel
+import com.achmadichzan.dicodingstory.presentation.viewmodel.UploadViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
 
 @Composable
-fun NavMain(
-    navController: NavHostController = rememberNavController()
-) {
+fun NavMain(navController: NavHostController = rememberNavController()) {
+
     val cachedToken = SessionManager.token
 
     val startDestination = when {
@@ -57,8 +66,30 @@ fun NavMain(
             val viewModel = koinViewModel<LoginViewModel>()
             val state = viewModel.state
 
+            LaunchedEffect(Unit) {
+                viewModel.navigationEvent.collect { event ->
+                    when (event) {
+                        LoginIntent.NavigateToStory -> {
+                            navController.navigate(Route.Story) {
+                                popUpTo(0)
+                            }
+                        }
+                        LoginIntent.NavigateToRegister -> {
+                            navController.navigate(Route.Register) {
+                                popUpTo(Route.Register) {
+                                    inclusive = false
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+
             LoginScreen(
-                navController = navController,
                 state = state,
                 onIntent = viewModel::onIntent
             )
@@ -80,8 +111,20 @@ fun NavMain(
             val viewModel = koinViewModel<RegisterViewModel>()
             val state = viewModel.state
 
+            LaunchedEffect(Unit) {
+                viewModel.navigationEvent.collect { event ->
+                    when (event) {
+                        RegisterIntent.NavigateBackToLogin -> {
+                            navController.navigate(Route.Login) {
+                                popUpTo(Route.Register) { inclusive = true }
+                            }
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+
             RegisterScreen(
-                navController = navController,
                 state = state,
                 onIntent = viewModel::onIntent
             )
@@ -177,17 +220,67 @@ fun NavMain(
                 )
             }
         ) { backstackEntry ->
-            val id = backstackEntry.arguments?.getString("id").toString()
+            val viewModel = koinViewModel<DetailViewModel>()
+            val id = backstackEntry.arguments?.getString("id") ?: ""
+            val state by remember { derivedStateOf { viewModel.state } }
 
-            DetailScreen(id = id, navController = navController)
+            LaunchedEffect(Unit) {
+                viewModel.navigationEvent.collect { event ->
+                    when (event) {
+                        is DetailIntent.GoBack -> {
+                            navController.navigateBack()
+                        }
+                        else -> Unit
+                    }
+                }
+            }
+
+            DetailScreen(
+                id = id,
+                state = state,
+                onIntent = viewModel::onIntent
+            )
         }
 
         composable<Route.AddStory> {
-            AddStoryScreen(navController = navController)
+            val viewModel = koinViewModel<UploadViewModel>()
+            val state = viewModel.state
+
+            LaunchedEffect(Unit) {
+                viewModel.navigationEvent.collect { intent ->
+                    when (intent) {
+                        AddStoryIntent.GoBack -> navController.popBackStack()
+                    }
+                }
+            }
+
+            AddStoryScreen(
+                state = state,
+                onUpload = { file, desc ->
+                    viewModel.uploadStory(file, desc, null, null)
+                },
+                onIntent = viewModel::onIntent
+            )
         }
 
         composable<Route.MapsLocation> {
-            MapsLocationScreen()
+            val viewModel = koinViewModel<MapsLocationViewModel>()
+            val stories by viewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(Unit) {
+                viewModel.navigationEvent.collect { event ->
+                    when (event) {
+                        MapsLocationIntent.GoBack -> {
+                            navController.popBackStack()
+                        }
+                    }
+                }
+            }
+
+            MapsLocationScreen(
+                stories = stories,
+                onIntent = viewModel::onIntent
+            )
         }
     }
 }

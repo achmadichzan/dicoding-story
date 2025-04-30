@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.usecase.RegisterUseCase
-import com.achmadichzan.dicodingstory.presentation.util.RegisterIntent
+import com.achmadichzan.dicodingstory.presentation.intent.RegisterIntent
 import com.achmadichzan.dicodingstory.presentation.state.RegisterState
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -18,12 +20,20 @@ class RegisterViewModel(
     private val registerUseCase: RegisterUseCase
 ) : ViewModel() {
 
+    private val _navigationEvent = MutableSharedFlow<RegisterIntent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
     var state by mutableStateOf(RegisterState())
         private set
 
     fun onIntent(intent: RegisterIntent) {
         when (intent) {
             is RegisterIntent.Submit -> register(intent.name, intent.email, intent.password)
+            is RegisterIntent.NavigateBackToLogin -> {
+                viewModelScope.launch {
+                    _navigationEvent.emit(intent)
+                }
+            }
         }
     }
 
@@ -36,6 +46,7 @@ class RegisterViewModel(
                     state = state.copy(isLoading = false, error = result.message)
                 } else {
                     state = state.copy(isLoading = false, success = result)
+                    _navigationEvent.emit(RegisterIntent.NavigateBackToLogin)
                 }
             } catch (e: ClientRequestException) {
                 val errorBody = e.response.bodyAsText()

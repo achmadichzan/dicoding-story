@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.achmadichzan.dicodingstory.presentation.navigation.NavMain
-import com.achmadichzan.dicodingstory.presentation.theme.DicodingStoryTheme
+import com.achmadichzan.dicodingstory.presentation.ui.theme.DicodingStoryTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

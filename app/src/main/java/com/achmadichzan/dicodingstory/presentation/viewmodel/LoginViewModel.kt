@@ -9,9 +9,11 @@ import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.usecase.LoginUseCase
 import com.achmadichzan.dicodingstory.domain.usecase.SaveTokenUseCase
 import com.achmadichzan.dicodingstory.presentation.state.LoginState
-import com.achmadichzan.dicodingstory.presentation.util.LoginIntent
+import com.achmadichzan.dicodingstory.presentation.intent.LoginIntent
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 
@@ -19,12 +21,22 @@ class LoginViewModel(
     private val loginUseCase: LoginUseCase,
     private val saveTokenUseCase: SaveTokenUseCase
 ) : ViewModel() {
+
+    private val _navigationEvent = MutableSharedFlow<LoginIntent>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
     var state by mutableStateOf(LoginState())
         private set
 
     fun onIntent(intent: LoginIntent) {
         when (intent) {
             is LoginIntent.Submit -> login(intent.email, intent.password)
+            is LoginIntent.NavigateToRegister,
+            is LoginIntent.NavigateToStory -> {
+                viewModelScope.launch {
+                    _navigationEvent.emit(intent)
+                }
+            }
         }
     }
 
@@ -38,6 +50,7 @@ class LoginViewModel(
                 } else {
                     saveTokenUseCase(result.loginResult?.token.orEmpty())
                     state = state.copy(isLoading = false, success = result.loginResult)
+                    _navigationEvent.emit(LoginIntent.NavigateToStory)
                 }
             } catch (e: ClientRequestException) {
                 val errorBody = e.response.bodyAsText()
