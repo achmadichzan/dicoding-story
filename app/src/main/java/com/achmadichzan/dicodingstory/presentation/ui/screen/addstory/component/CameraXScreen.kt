@@ -6,14 +6,22 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.ArrowBackIosNew
+import androidx.compose.material.icons.twotone.Camera
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +30,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -68,18 +78,21 @@ fun CameraXScreen(
         }
     }
 
-    Scaffold(contentWindowInsets = WindowInsets.safeContent) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)
-            .fillMaxSize()
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        contentWindowInsets = WindowInsets.safeContent
+    ) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize()
+            .padding(innerPadding)
         ) {
             AndroidView(
                 factory = { previewView },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                modifier = Modifier.fillMaxSize()
+                    .align(Alignment.Center)
+                    .aspectRatio(1f)
             )
 
-            Button(
+            IconButton(
                 onClick = {
                     val photoFile = FileUtil.createImageFile(context)
                     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
@@ -101,18 +114,30 @@ fun CameraXScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .align(Alignment.BottomCenter)
+                    .size(70.dp)
             ) {
-                Text("Capture")
+                Icon(
+                    imageVector = Icons.TwoTone.Camera,
+                    contentDescription = "Capture Image",
+                    modifier = Modifier.size(70.dp),
+                )
             }
 
-            OutlinedButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .align(Alignment.TopStart),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Back")
+                IconButton(
+                    onClick = onBack,
+                ) {
+                    Icon(
+                        imageVector = Icons.TwoTone.ArrowBackIosNew,
+                        contentDescription = "Capture Image",
+                    )
+                }
+                Text(text = "CameraX")
             }
         }
     }

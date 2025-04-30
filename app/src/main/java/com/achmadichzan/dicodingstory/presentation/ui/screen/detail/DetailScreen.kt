@@ -2,6 +2,12 @@ package com.achmadichzan.dicodingstory.presentation.ui.screen.detail
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateRotation
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -9,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -90,71 +97,33 @@ fun DetailScreen(
                 )
 
                 state.story != null -> {
+                    val scrollState = rememberScrollState()
+
+                    val scale = remember { Animatable(1f) }
+                    val rotation = remember { Animatable(0f) }
+                    val offset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
+                    val coroutineScope = rememberCoroutineScope()
+
+                    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
                     Column(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(horizontal = 16.dp)
-                            .verticalScroll(rememberScrollState())
-                            .zIndex(0f)
+                            .verticalScroll(scrollState)
                     ) {
-                        val scale = remember { Animatable(1f) }
-                        val rotation = remember { Animatable(0f) }
-                        val offset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }
-                        val coroutineScope = rememberCoroutineScope()
-
-                        val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
                         BoxWithConstraints(
                             modifier = Modifier.fillMaxWidth()
                                 .zIndex(1f),
                             contentAlignment = Alignment.Center
                         ) {
-
-                            val maxWidth = this.constraints.maxWidth
-                            val maxHeight = this.constraints.maxHeight
+                            val maxWidth = this.constraints.maxWidth.toFloat()
+                            val maxHeight = this.constraints.maxHeight.toFloat()
 
                             SubcomposeAsyncImage(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .pointerInput(Unit) {
-                                        detectTransformGesturesWithEnd(
-                                            onGesture = { _, pan, zoom, rotationChange ->
-                                                coroutineScope.launch {
-                                                    val newScale = (scale.value * zoom).coerceIn(1f, 5f)
-                                                    scale.snapTo(newScale)
-
-                                                    rotation.snapTo(rotation.value + rotationChange)
-
-                                                    val extraWidth = (scale.value - 1) * maxWidth
-                                                    val extraHeight = (scale.value - 1) * maxHeight
-
-                                                    val maxX = extraWidth / 2
-                                                    val maxY = extraHeight / 2
-
-                                                    val newOffset = Offset(
-                                                        (offset.value.x + scale.value * pan.x).coerceIn(-maxX, maxX),
-                                                        (offset.value.y + scale.value * pan.y).coerceIn(-maxY, maxY)
-                                                    )
-                                                    offset.snapTo(newOffset)
-                                                }
-                                            },
-                                            onGestureEnd = {
-                                                coroutineScope.launch {
-                                                    scale.animateTo(1f)
-                                                    rotation.animateTo(0f)
-                                                    offset.animateTo(Offset.Zero)
-                                                }
-                                            }
-                                        )
-                                    }
-                                    .graphicsLayer {
-                                        scaleX = scale.value
-                                        scaleY = scale.value
-                                        rotationZ = rotation.value
-                                        translationX = offset.value.x
-                                        translationY = offset.value.y
-                                    },
                                 model = state.story.photoUrl,
                                 contentDescription = state.story.name,
+                                contentScale = ContentScale.FillWidth,
                                 loading = {
                                     ShimmerEffect(
                                         modifier = Modifier
@@ -162,7 +131,52 @@ fun DetailScreen(
                                             .height(screenHeight * 0.4f)
                                     )
                                 },
-                                contentScale = ContentScale.FillWidth
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .pointerInput(Unit) {
+                                        awaitEachGesture {
+                                            var zooming = false
+
+                                            do {
+                                                val event = awaitPointerEvent()
+                                                val zoomChange = event.calculateZoom()
+                                                val rotationChange = event.calculateRotation()
+                                                val pan = event.calculatePan()
+                                                if (zoomChange != 1f || rotationChange != 0f || pan != Offset.Zero) {
+                                                    coroutineScope.launch {
+                                                        zooming = true
+                                                        val newScale = (scale.value * zoomChange).coerceIn(1f, 5f)
+                                                        scale.snapTo(newScale)
+                                                        rotation.snapTo(rotation.value + rotationChange)
+                                                        val extraWidth = (scale.value - 1) * maxWidth
+                                                        val extraHeight = (scale.value - 1) * maxHeight
+                                                        val maxX = extraWidth / 2
+                                                        val maxY = extraHeight / 2
+                                                        val newOffset = Offset(
+                                                            (offset.value.x + scale.value * pan.x).coerceIn(-maxX, maxX),
+                                                            (offset.value.y + scale.value * pan.y).coerceIn(-maxY, maxY)
+                                                        )
+                                                        offset.snapTo(newOffset)
+                                                    }
+                                                }
+                                            } while (event.changes.any { it.pressed })
+
+                                            if (zooming) {
+                                                coroutineScope.launch {
+                                                    scale.animateTo(1f)
+                                                    rotation.animateTo(0f)
+                                                    offset.animateTo(Offset.Zero)
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .graphicsLayer {
+                                        scaleX = scale.value
+                                        scaleY = scale.value
+                                        rotationZ = rotation.value
+                                        translationX = offset.value.x
+                                        translationY = offset.value.y
+                                    }
                             )
                         }
 

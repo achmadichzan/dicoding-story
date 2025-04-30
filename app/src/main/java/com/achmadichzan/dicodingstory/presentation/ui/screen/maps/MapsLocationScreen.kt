@@ -24,7 +24,6 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapsLocationScreen(
     stories: List<StoryEntity>,
@@ -39,6 +38,7 @@ fun MapsLocationScreen(
 
     Scaffold(
         topBar = {
+            @OptIn(ExperimentalMaterial3Api::class)
             TopAppBar(
                 title = { Text(text = "Maps") },
                 navigationIcon = {
