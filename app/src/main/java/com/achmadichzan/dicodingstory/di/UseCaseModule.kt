@@ -1,6 +1,6 @@
 package com.achmadichzan.dicodingstory.di
 
-import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
+import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPreferencesImpl
 import com.achmadichzan.dicodingstory.domain.repository.AuthRepository
 import com.achmadichzan.dicodingstory.domain.repository.StoryRepository
 import com.achmadichzan.dicodingstory.domain.usecase.ClearTokenUseCase
@@ -27,7 +27,7 @@ val useCaseModule = module {
     }
     factory<ClearTokenUseCase> {
         ClearTokenUseCase {
-            get<UserPreferencesImpl>().clearToken()
+            get<SessionManagerPreferencesImpl>().clearToken()
         }
     }
     factory<GetDetailStoryUseCase> {
@@ -37,12 +37,12 @@ val useCaseModule = module {
     }
     factory<GetTokenUseCase> {
         GetTokenUseCase {
-            get<UserPreferencesImpl>().getToken()
+            get<SessionManagerPreferencesImpl>().getToken()
         }
     }
     factory<SaveTokenUseCase> {
         SaveTokenUseCase { token ->
-            get<UserPreferencesImpl>().saveToken(token)
+            get<SessionManagerPreferencesImpl>().saveToken(token)
         }
     }
     factory<UploadStoryUseCase> {

@@ -205,11 +205,7 @@ fun DetailScreen(
                                     )
                                 }
                             ) {
-                                Marker(
-                                    state = MarkerState(position = storyLatLng),
-                                    title = state.story.name,
-                                    snippet = state.story.description
-                                )
+                                Marker(state = MarkerState(position = storyLatLng))
                             }
                         }
                     }

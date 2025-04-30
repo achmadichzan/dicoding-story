@@ -7,25 +7,30 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.achmadichzan.dicodingstory.data.local.preferences.UserPreferencesImpl
+import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPreferencesImpl
 import com.achmadichzan.dicodingstory.presentation.navigation.NavMain
 import com.achmadichzan.dicodingstory.presentation.ui.theme.DicodingStoryTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var userPreferences: UserPreferencesImpl
+    private lateinit var userPreferences: SessionManagerPreferencesImpl
     private var token: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        userPreferences = UserPreferencesImpl(applicationContext)
+        userPreferences = SessionManagerPreferencesImpl(applicationContext)
+
+        var isTokenLoaded = false
+
+        splashScreen.setKeepOnScreenCondition { !isTokenLoaded }
 
         lifecycleScope.launch {
             token = userPreferences.getToken()
+            isTokenLoaded = true
 
             setContent {
                 DicodingStoryTheme {

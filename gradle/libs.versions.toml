@@ -24,6 +24,7 @@ datastorePreferences = "1.1.4"
 cameraxVersion = "1.4.2"
 mapsKtx = "5.0.0"
 playServicesMaps = "19.2.0"
+playServicesLocation = "21.3.0"
 
 [libraries]
 
@@ -91,6 +92,7 @@ play-services-maps = { module = "com.google.android.gms:play-services-maps", ver
 maps-compose         = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils   = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsCompose" }
 maps-compose-widgets = { module = "com.google.maps.android:maps-compose-widgets", version.ref = "mapsCompose" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -168,5 +170,6 @@ maps = [
     "play-services-maps",
     "maps-compose",
     "maps-compose-utils",
-    "maps-compose-widgets"
+    "maps-compose-widgets",
+    "play-services-location"
 ]

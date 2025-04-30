@@ -10,7 +10,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -30,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -46,9 +47,9 @@ import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.dropUnlessResumed
 import coil3.compose.AsyncImage
-import com.achmadichzan.dicodingstory.presentation.ui.screen.addstory.component.CameraXScreen
-import com.achmadichzan.dicodingstory.presentation.state.UploadState
 import com.achmadichzan.dicodingstory.presentation.intent.AddStoryIntent
+import com.achmadichzan.dicodingstory.presentation.state.UploadState
+import com.achmadichzan.dicodingstory.presentation.ui.screen.addstory.component.CameraXScreen
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
 import java.io.File
 
@@ -76,7 +77,7 @@ fun AddStoryScreen(
                 imageUri = it.toUri()
                 showCameraX = false
             },
-            onBack = { showCameraX = false }
+            onBack = dropUnlessResumed { showCameraX = false }
         )
     } else {
         val galleryLauncher = rememberLauncherForActivityResult(
@@ -123,6 +124,17 @@ fun AddStoryScreen(
             cameraLauncher.launch(uri)
         }
 
+        val locationPermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                onIntent(AddStoryIntent.ToggleLocation(true))
+            } else {
+                Toast.makeText(context, "Location permission denied", Toast.LENGTH_SHORT).show()
+                onIntent(AddStoryIntent.ToggleLocation(false))
+            }
+        }
+
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -140,19 +152,22 @@ fun AddStoryScreen(
                     .padding(innerPadding)
                     .imePadding()
                     .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 imageUri?.let {
                     AsyncImage(
                         model = it,
                         contentDescription = "Selected Image",
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .height(200.dp)
                     )
                 } ?: Icon(
                     imageVector = Icons.TwoTone.AddPhotoAlternate,
                     contentDescription = "Upload Image",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .size(200.dp)
                 )
 
@@ -169,6 +184,7 @@ fun AddStoryScreen(
                     }) {
                         Text("Gallery")
                     }
+
                     OutlinedButton(onClick = dropUnlessResumed {
                         when (PackageManager.PERMISSION_GRANTED) {
                             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
@@ -196,19 +212,34 @@ fun AddStoryScreen(
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
-
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
                     label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .wrapContentHeight()
                         .height(100.dp),
                     shape = RoundedCornerShape(10.dp)
                 )
 
-                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Aktifkan Lokasi?")
+                    Switch(
+                        checked = state.isLocationEnabled,
+                        onCheckedChange = { isChecked ->
+                            if (isChecked) {
+                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                            } else {
+                                onIntent(AddStoryIntent.ToggleLocation(false))
+                            }
+                        }
+                    )
+                }
 
                 Button(
                     onClick = dropUnlessResumed {

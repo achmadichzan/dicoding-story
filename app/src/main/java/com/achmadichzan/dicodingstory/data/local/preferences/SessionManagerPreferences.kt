@@ -7,8 +7,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-object UserPreferences {
-    val Context.dataStore by preferencesDataStore(name = "user_prefs")
+val Context.dataStore by preferencesDataStore(name = "user_prefs")
+
+object SessionManagerPreferences {
     private val TOKEN_KEY = stringPreferencesKey("token")
 
     suspend fun saveToken(context: Context, token: String) {

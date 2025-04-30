@@ -14,6 +14,6 @@ val viewModelModule = module {
     viewModel { RegisterViewModel(get()) }
     viewModel { StoryViewModel(get(), get()) }
     viewModel { DetailViewModel(get()) }
-    viewModel { UploadViewModel(get()) }
+    viewModel { UploadViewModel(get(), get()) }
     viewModel { MapsLocationViewModel(get()) }
 }

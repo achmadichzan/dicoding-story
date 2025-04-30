@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.achmadichzan.dicodingstory.domain.preferences.LocationPreferencesImpl
 import com.achmadichzan.dicodingstory.domain.usecase.UploadStoryUseCase
 import com.achmadichzan.dicodingstory.presentation.state.UploadState
 import com.achmadichzan.dicodingstory.presentation.intent.AddStoryIntent
@@ -14,18 +15,36 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class UploadViewModel(
-    private val uploadStoryUseCase: UploadStoryUseCase
+    private val uploadStoryUseCase: UploadStoryUseCase,
+    private val locationPreferences: LocationPreferencesImpl
 ) : ViewModel() {
-
-    var state by mutableStateOf(UploadState())
-        private set
 
     private val _navigationEvent = MutableSharedFlow<AddStoryIntent>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
+    var state by mutableStateOf(UploadState())
+        private set
+
+    init {
+        viewModelScope.launch {
+            locationPreferences.isLocationEnabled.collect { enabled ->
+                state = state.copy(isLocationEnabled = enabled)
+            }
+        }
+    }
+
+    private fun toggleLocation(enabled: Boolean) {
+        viewModelScope.launch {
+            locationPreferences.setLocationEnabled(enabled)
+        }
+    }
+
     fun onIntent(intent: AddStoryIntent) {
         viewModelScope.launch {
-            _navigationEvent.emit(intent)
+            when (intent) {
+                is AddStoryIntent.GoBack -> _navigationEvent.emit(intent)
+                is AddStoryIntent.ToggleLocation -> toggleLocation(intent.enabled)
+            }
         }
     }
 

@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
 import java.io.File
 
@@ -90,7 +91,7 @@ fun CameraXScreen(
             )
 
             IconButton(
-                onClick = {
+                onClick = dropUnlessResumed {
                     val photoFile = FileUtil.createImageFile(context)
                     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 

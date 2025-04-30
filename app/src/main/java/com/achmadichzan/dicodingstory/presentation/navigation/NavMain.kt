@@ -1,5 +1,8 @@
 package com.achmadichzan.dicodingstory.presentation.navigation
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Location
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -34,6 +37,7 @@ import com.achmadichzan.dicodingstory.presentation.viewmodel.MapsLocationViewMod
 import com.achmadichzan.dicodingstory.presentation.viewmodel.RegisterViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.StoryViewModel
 import com.achmadichzan.dicodingstory.presentation.viewmodel.UploadViewModel
+import com.google.android.gms.location.LocationServices
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.getKoin
 
@@ -240,19 +244,31 @@ fun NavMain(token: String?) {
         composable<Route.AddStory> {
             val viewModel = koinViewModel<UploadViewModel>()
             val state = viewModel.state
+            val context = getKoin().get<Context>()
 
             LaunchedEffect(Unit) {
                 viewModel.navigationEvent.collect { intent ->
                     when (intent) {
                         AddStoryIntent.GoBack -> navController.navigateBack()
+                        else -> Unit
                     }
                 }
             }
 
+            @SuppressLint("MissingPermission")
             AddStoryScreen(
                 state = state,
                 onUpload = { file, desc ->
-                    viewModel.uploadStory(file, desc, null, null)
+                    if (state.isLocationEnabled) {
+                        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+                        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                            val lat = location?.latitude
+                            val lon = location?.longitude
+                            viewModel.uploadStory(file, desc, lat, lon)
+                        }
+                    } else {
+                        viewModel.uploadStory(file, desc, null, null)
+                    }
                 },
                 onIntent = viewModel::onIntent
             )
