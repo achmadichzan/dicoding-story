@@ -7,6 +7,8 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.twotone.AddPhotoAlternate
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +55,7 @@ import com.achmadichzan.dicodingstory.presentation.intent.AddStoryIntent
 import com.achmadichzan.dicodingstory.presentation.state.UploadState
 import com.achmadichzan.dicodingstory.presentation.ui.screen.addstory.component.CameraXScreen
 import com.achmadichzan.dicodingstory.presentation.util.FileUtil
+import kotlinx.coroutines.launch
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,18 +68,20 @@ fun AddStoryScreen(
     val context = LocalContext.current
 
     var description by remember { mutableStateOf("") }
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-    var file by remember { mutableStateOf<File?>(null) }
-
     val cameraImageUri = remember { mutableStateOf<Uri?>(null) }
-
     var showCameraX by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val animatedProgress by animateFloatAsState(
+        targetValue = state.compressingProgress / 100f,
+        animationSpec = tween(durationMillis = 300),
+        label = "CompressionProgress"
+    )
 
     if (showCameraX) {
         CameraXScreen(
             onImageCaptured = {
-                file = it
-                imageUri = it.toUri()
+                onIntent(AddStoryIntent.PickImage(it.toUri(), context))
                 showCameraX = false
             },
             onBack = dropUnlessResumed { showCameraX = false }
@@ -84,9 +91,7 @@ fun AddStoryScreen(
             contract = ActivityResultContracts.PickVisualMedia()
         ) { uri: Uri? ->
             uri?.let {
-                imageUri = it
-                val originalFile = FileUtil.from(context, it)
-                file = FileUtil.compressImageFile(context, originalFile)
+                onIntent(AddStoryIntent.PickImage(it, context))
             }
         }
 
@@ -95,9 +100,7 @@ fun AddStoryScreen(
         ) { success ->
             if (success) {
                 cameraImageUri.value?.let { uri ->
-                    imageUri = uri
-                    val originalFile = FileUtil.from(context, uri)
-                    file = FileUtil.compressImageFile(context, originalFile)
+                    onIntent(AddStoryIntent.PickImage(uri, context))
                 }
             }
         }
@@ -113,15 +116,16 @@ fun AddStoryScreen(
         }
 
         val launchCamera: () -> Unit = {
-            val tempFile = FileUtil.createImageFile(context)
-            val uri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                tempFile
-            )
-            cameraImageUri.value = uri
-            file = tempFile
-            cameraLauncher.launch(uri)
+            coroutineScope.launch {
+                val tempFile = FileUtil.createImageFile(context)
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    tempFile
+                )
+                cameraImageUri.value = uri
+                cameraLauncher.launch(uri)
+            }
         }
 
         val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -153,23 +157,33 @@ fun AddStoryScreen(
                     .imePadding()
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                imageUri?.let {
-                    AsyncImage(
-                        model = it,
-                        contentDescription = "Selected Image",
+                if (state.isCompressing) {
+                    CircularProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .size(70.dp),
+                        strokeWidth = 8.dp
+                    )
+                } else {
+                    state.imageUri?.let {
+                        AsyncImage(
+                            model = it,
+                            contentDescription = "Selected Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
+                    } ?: Icon(
+                        imageVector = Icons.TwoTone.AddPhotoAlternate,
+                        contentDescription = "Upload Image",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .size(200.dp)
                     )
-                } ?: Icon(
-                    imageVector = Icons.TwoTone.AddPhotoAlternate,
-                    contentDescription = "Upload Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .size(200.dp)
-                )
+                }
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -243,9 +257,9 @@ fun AddStoryScreen(
 
                 Button(
                     onClick = dropUnlessResumed {
-                        file?.let { onUpload(it, description) }
+                        state.selectedFile?.let { onUpload(it, description) }
                     },
-                    enabled = file != null && description.isNotEmpty() && !state.isLoading,
+                    enabled = state.selectedFile != null && description.isNotEmpty() && !state.isLoading,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(if (state.isLoading) "Uploading..." else "Upload")

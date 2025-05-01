@@ -4,6 +4,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import com.achmadichzan.dicodingstory.presentation.util.FileUtil.createImageFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -11,26 +15,32 @@ import java.util.Date
 import java.util.Locale
 
 object FileUtil {
-    fun from(context: Context, uri: Uri): File {
+    suspend fun from(context: Context, uri: Uri): File = withContext(Dispatchers.IO) {
         val inputStream = context.contentResolver.openInputStream(uri)
         val file = File(context.cacheDir, "upload-${System.currentTimeMillis()}.jpg")
         file.outputStream().use { inputStream?.copyTo(it) }
-        return file
+        file
     }
 
-    fun createImageFile(context: Context): File {
+    suspend fun createImageFile(context: Context): File = withContext(Dispatchers.IO) {
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "JPEG_${timestamp}_"
         val storageDir = context.cacheDir
-        return File.createTempFile(fileName, ".jpg", storageDir)
+        File.createTempFile(fileName, ".jpg", storageDir)
     }
 
-    fun compressImageFile(context: Context, file: File, maxSizeKB: Int = 1000): File {
+    suspend fun compressImageFileWithProgress(
+        context: Context,
+        file: File,
+        maxSizeKB: Int = 1000,
+        onProgress: (Float) -> Unit
+    ): File = withContext(Dispatchers.IO) {
         val originalBitmap = BitmapFactory.decodeFile(file.path)
         val compressedFile = createImageFile(context)
 
         var quality = 100
         var streamLength: Int
+        val targetSize = maxSizeKB * 1024f
 
         do {
             val stream = ByteArrayOutputStream()
@@ -38,12 +48,16 @@ object FileUtil {
             val byteArray = stream.toByteArray()
             streamLength = byteArray.size
             quality -= 5
+
+            val progress = (targetSize / streamLength).coerceAtMost(1f) * 100f
+            onProgress(progress)
+
         } while (streamLength / 1024 > maxSizeKB && quality > 5)
 
         compressedFile.outputStream().use {
             originalBitmap.compress(Bitmap.CompressFormat.JPEG, quality, it)
         }
 
-        return compressedFile
+        compressedFile
     }
 }

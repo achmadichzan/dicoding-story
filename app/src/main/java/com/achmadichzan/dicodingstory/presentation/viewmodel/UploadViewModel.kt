@@ -9,9 +9,12 @@ import com.achmadichzan.dicodingstory.domain.preferences.LocationPreferencesImpl
 import com.achmadichzan.dicodingstory.domain.usecase.UploadStoryUseCase
 import com.achmadichzan.dicodingstory.presentation.state.UploadState
 import com.achmadichzan.dicodingstory.presentation.intent.AddStoryIntent
+import com.achmadichzan.dicodingstory.presentation.util.FileUtil
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class UploadViewModel(
@@ -44,6 +47,28 @@ class UploadViewModel(
             when (intent) {
                 is AddStoryIntent.GoBack -> _navigationEvent.emit(intent)
                 is AddStoryIntent.ToggleLocation -> toggleLocation(intent.enabled)
+                is AddStoryIntent.PickImage -> {
+                    state = state.copy(isCompressing = true)
+
+                    val file = withContext(Dispatchers.IO) {
+                        var progress = 0f
+                        val file = FileUtil.compressImageFileWithProgress(
+                            intent.context,
+                            FileUtil.from(intent.context, intent.uri)
+                        ) { newProgress ->
+                            progress = newProgress
+                            state = state.copy(compressingProgress = progress)
+                        }
+                        file
+                    }
+
+                    state = state.copy(
+                        selectedFile = file,
+                        imageUri = intent.uri,
+                        isCompressing = false,
+                        compressingProgress = 0f
+                    )
+                }
             }
         }
     }
