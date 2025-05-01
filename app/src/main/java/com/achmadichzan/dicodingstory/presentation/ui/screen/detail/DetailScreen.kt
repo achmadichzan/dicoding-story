@@ -1,11 +1,16 @@
 package com.achmadichzan.dicodingstory.presentation.ui.screen.detail
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -16,9 +21,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.twotone.ArrowBackIosNew
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -26,8 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -37,6 +46,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil3.compose.SubcomposeAsyncImage
@@ -58,6 +70,8 @@ fun DetailScreen(
     state: DetailState,
     onIntent: (DetailIntent) -> Unit,
 ) {
+    var isMapShowing by remember { mutableStateOf(false) }
+
     LaunchedEffect(id) {
         onIntent(DetailIntent.LoadDetail(id))
     }
@@ -65,13 +79,17 @@ fun DetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Story Detail") },
+                title = { Text(
+                    text = state.story?.name ?: "Detail Story",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                ) },
                 navigationIcon = {
                     IconButton(onClick = {
                         onIntent(DetailIntent.GoBack)
                     }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                            imageVector = Icons.TwoTone.ArrowBackIosNew,
                             contentDescription = "Back"
                         )
                     }
@@ -106,7 +124,8 @@ fun DetailScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 16.dp)
-                            .verticalScroll(scrollState)
+                            .verticalScroll(scrollState),
+                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                     ) {
                         BoxWithConstraints(
                             modifier = Modifier.fillMaxWidth()
@@ -176,13 +195,20 @@ fun DetailScreen(
                             )
                         }
 
-                        Text("Name: ${state.story.name}", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = state.story.name,
+                            fontWeight = FontWeight.Bold
+                        )
 
-                        Text("Description: ${state.story.description}")
+                        Text(
+                            text = state.story.description,
+                            textAlign = TextAlign.Justify
+                        )
 
                         state.story.lat?.let { Text("Lat: $it") }
 
                         state.story.lon?.let { Text("Lon: $it") }
+
 
                         val cameraPositionState = rememberCameraPositionState()
 
@@ -190,22 +216,49 @@ fun DetailScreen(
                         val lon = state.story.lon
 
                         if (lat != null && lon != null) {
+                            FilledTonalIconToggleButton(
+                                checked = !isMapShowing,
+                                onCheckedChange = {
+                                    isMapShowing = !it
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(text = "Show map")
+                            }
+
                             val storyLatLng = LatLng(
                                 state.story.lat,
                                 state.story.lon
                             )
-                            GoogleMap(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(screenHeight * 0.4f),
-                                cameraPositionState = cameraPositionState,
-                                onMapLoaded = {
-                                    cameraPositionState.move(
-                                        CameraUpdateFactory.newLatLngZoom(storyLatLng, 8f)
+
+                            AnimatedVisibility(
+                                visible = !isMapShowing,
+                                enter = slideIn(
+                                    initialOffset = { IntOffset(0, it.height) },
+                                    animationSpec = tween(durationMillis = 300)
+                                ),
+                                exit = slideOut(
+                                    targetOffset = { IntOffset(0, it.height) },
+                                    animationSpec = tween(durationMillis = 300)
+                                ),
+                            ) {
+                                GoogleMap(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(screenHeight * 0.4f),
+                                    cameraPositionState = cameraPositionState,
+                                    onMapLoaded = {
+                                        cameraPositionState.move(
+                                            CameraUpdateFactory.newLatLngZoom(storyLatLng, 8f)
+                                        )
+                                    }
+                                ) {
+                                    Marker(
+                                        state = MarkerState(position = storyLatLng),
+                                        alpha = 0.8f,
+                                        title = state.story.name,
                                     )
                                 }
-                            ) {
-                                Marker(state = MarkerState(position = storyLatLng))
                             }
                         }
                     }

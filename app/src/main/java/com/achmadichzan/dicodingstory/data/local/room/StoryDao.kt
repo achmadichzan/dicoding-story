@@ -19,4 +19,7 @@ interface StoryDao {
 
     @Query("SELECT * FROM stories WHERE lat IS NOT NULL AND lon IS NOT NULL")
     fun observeStoriesWithLocation(): Flow<List<StoryEntity>>
+
+    @Query("SELECT COUNT(*) FROM stories")
+    suspend fun count(): Int
 }

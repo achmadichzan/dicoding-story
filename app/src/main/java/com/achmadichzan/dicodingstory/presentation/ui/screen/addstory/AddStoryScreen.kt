@@ -22,8 +22,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.twotone.AddPhotoAlternate
+import androidx.compose.material.icons.twotone.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -144,7 +144,7 @@ fun AddStoryScreen(
                 TopAppBar(
                     navigationIcon = {
                         IconButton(onClick = { onIntent(AddStoryIntent.GoBack) }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "Back")
+                            Icon(Icons.TwoTone.ArrowBackIosNew, contentDescription = "Back")
                         }
                     },
                     title = { Text("Upload Story") }
@@ -196,7 +196,7 @@ fun AddStoryScreen(
                             )
                         )
                     }) {
-                        Text("Gallery")
+                        Text("Galeri")
                     }
 
                     OutlinedButton(onClick = dropUnlessResumed {
@@ -209,12 +209,15 @@ fun AddStoryScreen(
                             }
                         }
                     }) {
-                        Text("Camera")
+                        Text("Kamera")
                     }
 
                     OutlinedButton(onClick = dropUnlessResumed {
                         when (PackageManager.PERMISSION_GRANTED) {
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            ) -> {
                                 showCameraX = true
                             }
                             else -> {
@@ -229,7 +232,7 @@ fun AddStoryScreen(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("Description") },
+                    label = { Text("Deksripsi") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
@@ -247,7 +250,8 @@ fun AddStoryScreen(
                         checked = state.isLocationEnabled,
                         onCheckedChange = { isChecked ->
                             if (isChecked) {
-                                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                locationPermissionLauncher
+                                    .launch(Manifest.permission.ACCESS_FINE_LOCATION)
                             } else {
                                 onIntent(AddStoryIntent.ToggleLocation(false))
                             }
@@ -259,10 +263,11 @@ fun AddStoryScreen(
                     onClick = dropUnlessResumed {
                         state.selectedFile?.let { onUpload(it, description) }
                     },
-                    enabled = state.selectedFile != null && description.isNotEmpty() && !state.isLoading,
+                    enabled = state.selectedFile != null
+                            && description.isNotEmpty() && !state.isLoading,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(if (state.isLoading) "Uploading..." else "Upload")
+                    Text(if (state.isLoading) "Mengupload..." else "Upload")
                 }
 
                 state.error?.let {

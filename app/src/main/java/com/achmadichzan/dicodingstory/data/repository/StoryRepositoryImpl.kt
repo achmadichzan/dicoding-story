@@ -39,10 +39,9 @@ class StoryRepositoryImpl(
         @OptIn(ExperimentalPagingApi::class)
         return Pager(
             config = PagingConfig(
-                pageSize = 10,
-                prefetchDistance = 1,
-                initialLoadSize = 10,
-                enablePlaceholders = false
+                pageSize = 20,
+                prefetchDistance = 0,
+                initialLoadSize = 10
             ),
             remoteMediator = StoryRemoteMediator(
                 database = database,
