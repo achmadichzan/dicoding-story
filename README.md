@@ -40,7 +40,7 @@ A simple Android app built using Jetpack Compose that allows users to view, uplo
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/your-username/dicoding-story.git
+git clone https://github.com/achmadichzan/dicoding-story.git
 cd dicoding-story
 ```
 1. **Open with Android Studio**
