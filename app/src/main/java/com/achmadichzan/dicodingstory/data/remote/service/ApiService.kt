@@ -76,9 +76,14 @@ class ApiService(
             formData = formData {
                 append("description", description)
                 append("photo", file.readBytes(), Headers.build {
-                    append(HttpHeaders.ContentType, ContentType.Image.JPEG.contentType)
-                    append(HttpHeaders.ContentType, ContentType.Image.PNG.contentType)
-                    append(HttpHeaders.ContentType, ContentType.Image.Any.contentType)
+                    val contentType = when (file.extension.lowercase()) {
+                        "jpg", "jpeg" -> ContentType.Image.JPEG
+                        "png" -> ContentType.Image.PNG
+                        "webp" -> ContentType.parse("image/webp")
+                        "gif" -> ContentType.Image.GIF
+                        else -> ContentType.Image.Any
+                    }
+                    append(HttpHeaders.ContentType, contentType.contentType)
                     append(
                         HttpHeaders.ContentDisposition,
                         "form-data; name=\"photo\"; filename=\"${file.name}\""

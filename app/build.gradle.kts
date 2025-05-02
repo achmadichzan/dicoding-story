@@ -26,7 +26,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -69,41 +70,31 @@ android {
 
 dependencies {
 
-    // Lifecycle
-    implementation(libs.bundles.lifecycle)
+    implementation(libs.bundles.lifecycle) // Lifecycle
 
-    // Koin
-    implementation(libs.bundles.koin)
+    implementation(libs.bundles.koin) // Koin
 
-    // Ktor
-    implementation(libs.bundles.ktor)
+    implementation(libs.bundles.ktor) // Ktor
 
-    // Navigation
-    implementation(libs.bundles.navigation)
+    implementation(libs.bundles.navigation) // Navigation
 
-    // Coil
-    implementation(libs.bundles.coil)
+    implementation(libs.bundles.coil) // Coil
 
     // Room
     implementation(libs.bundles.room)
     ksp(libs.room.compiler)
 
-    // Paging3
-    implementation(libs.bundles.paging3)
+    implementation(libs.bundles.paging3) // Paging3
 
-    // Data Store
-    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.datastore.preferences) // Data Store
 
-    // Splash Screen
-    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.core.splashscreen) // Splash Screen
 
     implementation(libs.androidx.material.icons.extended)
 
-    // CameraX
-    implementation(libs.bundles.camera)
+    implementation(libs.bundles.camera) // CameraX
 
-    // Maps
-    implementation(libs.bundles.maps)
+    implementation(libs.bundles.maps) // Maps
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
