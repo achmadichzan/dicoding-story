@@ -40,11 +40,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -52,20 +50,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import coil3.imageLoader
 import coil3.request.ImageRequest
-import com.achmadichzan.dicodingstory.data.local.preferences.ScrollPreferences
-import com.achmadichzan.dicodingstory.data.local.preferences.scrollDataStore
 import com.achmadichzan.dicodingstory.domain.model.StoryDto
 import com.achmadichzan.dicodingstory.presentation.intent.StoryIntent
 import com.achmadichzan.dicodingstory.presentation.ui.screen.story.component.StoryItem
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,15 +85,8 @@ fun StoryScreen(
     }
 
     val context = LocalContext.current
-    val indexOffset = produceState(initialValue = 0 to 0) {
-        context.scrollDataStore.data.firstOrNull()?.let { prefs ->
-            value = (prefs[ScrollPreferences.INDEX] ?: 0) to (prefs[ScrollPreferences.OFFSET] ?: 0)
-        }
-    }
-    val listState = rememberLazyListState(
-        initialFirstVisibleItemIndex = indexOffset.value.first,
-        initialFirstVisibleItemScrollOffset = indexOffset.value.second
-    )
+
+    val listState = rememberLazyListState()
     val showScrollToTopButton by remember {
         derivedStateOf { listState.firstVisibleItemIndex > 0 }
     }
@@ -117,17 +104,6 @@ fun StoryScreen(
                 .data(story.photoUrl)
                 .build()
             imageLoader.enqueue(request)
-        }
-    }
-
-    LaunchedEffect(listState) {
-        snapshotFlow {
-            listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
-        }.collect { (index, offset) ->
-            context.scrollDataStore.edit { prefs ->
-                prefs[ScrollPreferences.INDEX] = index
-                prefs[ScrollPreferences.OFFSET] = offset
-            }
         }
     }
 
@@ -206,11 +182,11 @@ fun StoryScreen(
             AnimatedVisibility(
                 visible = showScrollToBottomButton,
                 enter = slideIn(
-                    initialOffset = { IntOffset(0, it.height) },
+                    initialOffset = { IntOffset(0, it.height + 20) },
                     animationSpec = tween(durationMillis = 300)
                 ),
                 exit = slideOut(
-                    targetOffset = { IntOffset(0, it.height) },
+                    targetOffset = { IntOffset(0, it.height + 20) },
                     animationSpec = tween(durationMillis = 300)
                 ),
                 modifier = Modifier
@@ -281,7 +257,7 @@ fun StoryScreen(
                         ) {
                             items(
                                 count = pagingStories.itemCount,
-                                key = { index -> pagingStories[index]?.id ?: index },
+                                key = { index -> pagingStories.peek(index)?.id ?: "placeholder_$index" },
                                 contentType = pagingStories.itemContentType { "StoryPagingItems" }
                             ) { index ->
                                 val story = pagingStories[index]

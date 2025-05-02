@@ -1,6 +1,7 @@
 package com.achmadichzan.dicodingstory.domain.model
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -35,6 +36,7 @@ data class StoryResponse(
     val listStory: List<StoryDto>
 ): Parcelable
 
+@Immutable
 @Parcelize
 @Serializable
 data class StoryDto(

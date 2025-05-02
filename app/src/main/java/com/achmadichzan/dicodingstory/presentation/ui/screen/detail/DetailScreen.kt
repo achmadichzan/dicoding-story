@@ -5,7 +5,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOut
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
@@ -232,15 +234,16 @@ fun DetailScreen(
                             )
 
                             AnimatedVisibility(
-                                visible = !isMapShowing,
-                                enter = slideIn(
-                                    initialOffset = { IntOffset(0, it.height) },
-                                    animationSpec = tween(durationMillis = 300)
+                                visible = isMapShowing,
+                                enter = slideInVertically(
+                                    animationSpec = tween(durationMillis = 300),
+                                    initialOffsetY = { -(it + 10) / 2 }
                                 ),
-                                exit = slideOut(
-                                    targetOffset = { IntOffset(0, it.height) },
-                                    animationSpec = tween(durationMillis = 300)
+                                exit = slideOutVertically(
+                                    animationSpec = tween(durationMillis = 300),
+                                    targetOffsetY = { -(it + 10) / 2 }
                                 ),
+                                label = "Map"
                             ) {
                                 GoogleMap(
                                     modifier = Modifier
