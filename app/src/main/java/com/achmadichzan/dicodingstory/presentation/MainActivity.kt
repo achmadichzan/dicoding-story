@@ -7,14 +7,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPreferencesImpl
+import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPrefImpl
 import com.achmadichzan.dicodingstory.presentation.navigation.NavMain
 import com.achmadichzan.dicodingstory.presentation.ui.theme.DicodingStoryTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var userPreferences: SessionManagerPreferencesImpl
+    private lateinit var userPreferences: SessionManagerPrefImpl
     private var token: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        userPreferences = SessionManagerPreferencesImpl(applicationContext)
+        userPreferences = SessionManagerPrefImpl(applicationContext)
 
         var isTokenLoaded = false
 

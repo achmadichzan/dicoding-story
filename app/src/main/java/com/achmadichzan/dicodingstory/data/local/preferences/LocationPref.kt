@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 
 val Context.locationDataStore by preferencesDataStore(name = "location_prefs")
 
-class LocationPreferences(private val context: Context) {
+class LocationPref(private val context: Context) {
 
     private val LOCATION_ENABLED_KEY = booleanPreferencesKey("is_location_enabled")
 

@@ -121,9 +121,7 @@ fun StoryScreen(
                             contentDescription = "Logout"
                         )
                     }
-                    IconButton(onClick = dropUnlessResumed {
-                        isLoggingOut = true }
-                    ) {
+                    IconButton(onClick = dropUnlessResumed { isLoggingOut = true }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.Logout,
                             contentDescription = "Logout"
@@ -175,9 +173,8 @@ fun StoryScreen(
         }
     ) { innerPadding ->
         Box(
-            modifier = Modifier
+            modifier = Modifier.padding(innerPadding)
                 .fillMaxSize()
-                .padding(innerPadding)
         ) {
             AnimatedVisibility(
                 visible = showScrollToBottomButton,
@@ -252,16 +249,21 @@ fun StoryScreen(
                                 .padding(horizontal = 16.dp),
                             state = listState,
                             contentPadding = PaddingValues(vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(
+                                8.dp,
+                                Alignment.CenterVertically
+                            ),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             items(
                                 count = pagingStories.itemCount,
-                                key = { index -> pagingStories.peek(index)?.id ?: "placeholder_$index" },
-                                contentType = pagingStories.itemContentType { "StoryPagingItems" }
+                                key = { index ->
+                                    pagingStories.peek(index)?.id ?: "placeholder_$index"
+                                },
+                                // below is currently redundant bcz the model has only 1 data type
+                                // contentType = pagingStories.itemContentType { "StoryPagingItems" }
                             ) { index ->
-                                val story = pagingStories[index]
-                                if (story != null) {
+                                pagingStories.peek(index)?.let { story ->
                                     StoryItem(
                                         modifier = Modifier
                                             .graphicsLayer {

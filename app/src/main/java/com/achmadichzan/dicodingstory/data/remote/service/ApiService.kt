@@ -1,6 +1,6 @@
 package com.achmadichzan.dicodingstory.data.remote.service
 
-import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPreferencesImpl
+import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPrefImpl
 import com.achmadichzan.dicodingstory.domain.model.BaseResponse
 import com.achmadichzan.dicodingstory.domain.model.DetailResponse
 import com.achmadichzan.dicodingstory.domain.model.LoginRequest
@@ -24,7 +24,7 @@ import java.io.File
 
 class ApiService(
     private val client: HttpClient,
-    private val preferences: SessionManagerPreferencesImpl
+    private val preferences: SessionManagerPrefImpl
 ) {
 
     suspend fun register(request: RegisterRequest): BaseResponse {

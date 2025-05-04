@@ -4,7 +4,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPreferencesImpl
+import com.achmadichzan.dicodingstory.domain.preferences.SessionManagerPrefImpl
 import com.achmadichzan.dicodingstory.data.local.room.StoryDatabase
 import com.achmadichzan.dicodingstory.data.local.room.StoryEntity
 import com.achmadichzan.dicodingstory.data.remote.paging.StoryRemoteMediator
@@ -17,7 +17,7 @@ import java.io.File
 
 class StoryRepositoryImpl(
     private val apiService: ApiService,
-    private val preferences: SessionManagerPreferencesImpl,
+    private val preferences: SessionManagerPrefImpl,
     private val database: StoryDatabase
 ) : StoryRepository {
 

@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.achmadichzan.dicodingstory.domain.preferences.LocationPreferencesImpl
+import com.achmadichzan.dicodingstory.domain.preferences.LocationPrefImpl
 import com.achmadichzan.dicodingstory.domain.usecase.UploadStoryUseCase
 import com.achmadichzan.dicodingstory.presentation.state.UploadState
 import com.achmadichzan.dicodingstory.presentation.intent.AddStoryIntent
@@ -19,7 +19,7 @@ import java.io.File
 
 class UploadViewModel(
     private val uploadStoryUseCase: UploadStoryUseCase,
-    private val locationPreferences: LocationPreferencesImpl
+    private val locationPreferences: LocationPrefImpl
 ) : ViewModel() {
 
     private val _navigationEvent = MutableSharedFlow<AddStoryIntent>()
